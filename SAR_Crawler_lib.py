@@ -152,10 +152,21 @@ class SAR_Wiki_Crawler:
         """
         def clean_text(txt):
             return '\n'.join(l for l in txt.split('\n') if len(l) > 0)
+        
+        text = clean_text(text)
+        match = self.title_sum_re.match(text)
+        title, summary, rest = match.group(1, 2, 3)
 
-        document = None
+        document  = {
+            "url": url,
+            "title": title,
+            "summary": summary,
+            "sections":{}
+        }
 
         # COMPLETAR
+
+       
 
         return document
 
