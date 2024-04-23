@@ -155,14 +155,20 @@ class SAR_Wiki_Crawler:
         
         text = clean_text(text)
         match = self.title_sum_re.match(text)
-        title, summary, rest = match.group(1, 2, 3)
+        document = match.groupdict()
+        rest = document["rest"]
+        del(document["rest"])
+        sections = self.sections_re.findall(rest)
+        document["sections"] = []
+        
 
-        document  = {
-            "url": url,
-            "title": title,
-            "summary": summary,
-            "sections":{}
-        }
+        for i in range(len(sections) - 1):
+            next_section = sections[i + 1] if sections[i + 1] else None
+            section_match = self.section_re.match(rest, rest.index(sections[i]), rest.index(next_section))
+            section_dic = section_match.groupdict()
+            del(section_dic["rest"])
+            section_dic["subsections"] = []
+            document["sections"].append(section_dic)
 
         # COMPLETAR
 
