@@ -198,7 +198,7 @@ class SAR_Wiki_Crawler:
                 
             
                 subsection_match = self.subsection_re.match(subsection_text)
-                subsection_dic = subsection_match.groupdict()
+                subsection_dic = subsection_match.groupdict() if subsection_match is not None else None
                 
                 document["sections"][i]["subsections"].append(subsection_dic)
                 
@@ -276,7 +276,7 @@ class SAR_Wiki_Crawler:
         total_documents_captured = 0
         # Contador del número de ficheros escritos
         files_count = 0
-
+        depth = 0
         # En caso de que no utilicemos bach_size, asignamos None a total_files
         # así el guardado no modificará el nombre del fichero base
         if batch_size is None:
@@ -286,8 +286,26 @@ class SAR_Wiki_Crawler:
             # de guardado
             total_files = math.ceil(document_limit / batch_size)
 
+        print(queue)
         # COMPLETAR
-
+        while queue and total_documents_captured <= document_limit and depth <= max_depth_level:
+            depth, base_url, article_url = hq.heappop(queue)
+            print(depth, article_url)
+            
+            if article_url not in visited and self.is_valid_url(article_url):
+                print(article_url)
+                visited.add(article_url)
+                content, urls_from_article = self.get_wikipedia_entry_content(f"{base_url}{article_url}")
+                
+                documents.append(self.parse_wikipedia_textual_content(content, f"{base_url}{article_url}"))
+                total_documents_captured += 1
+                if len(documents) == batch_size:
+                    self.save_documents(documents, base_filename=base_filename, num_file=files_count, total_files=total_files)
+                    documents = []
+                    files_count += 1
+                for url in urls_from_article:
+                    if self.is_valid_url(url):
+                        hq.heappush(queue, (depth + 1, "https://es.wikipedia.org", url))
 
     def wikipedia_crawling_from_url(self,
         initial_url: str, document_limit: int, base_filename: str,
