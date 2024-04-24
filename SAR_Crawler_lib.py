@@ -154,21 +154,54 @@ class SAR_Wiki_Crawler:
             return '\n'.join(l for l in txt.split('\n') if len(l) > 0)
         
         text = clean_text(text)
+        
+        #Objeto match que devuelve la expresión regular
         match = self.title_sum_re.match(text)
+        
+        #Gracias a la expresión regular el diccionario de grupos del objeto match
+        #tiene como claves "name", "title" y "rest"
         document = match.groupdict()
         rest = document["rest"]
+        #Nos guardamos rest en una variable y se borra del diccionario
         del(document["rest"])
+        
         sections = self.sections_re.findall(rest)
         document["sections"] = []
         
 
-        for i in range(len(sections) - 1):
-            next_section = sections[i + 1] if sections[i + 1] else None
-            section_match = self.section_re.match(rest, rest.index(sections[i]), rest.index(next_section))
+        for i in range(len(sections)):
+            #Cogemos el texto de la sección que es hasta la siguiente sección si estamos en las secciones
+            #[1, n - 1] y hasta el final en la última sección
+            if i < len(sections) - 1:
+                next_section = sections[i + 1]
+                section_text = rest[rest.index(sections[i]):rest.index(next_section)]
+            else:
+                section_text = rest[rest.index(sections[i]):]
+                
+            section_match = self.section_re.match(section_text)
+            #Mismo procedimiento que en el principio
             section_dic = section_match.groupdict()
             del(section_dic["rest"])
             section_dic["subsections"] = []
+            
             document["sections"].append(section_dic)
+            
+            subsections = self.subsections_re.findall(section_text)
+            
+            for j in range(len(subsections)):
+                #Mismo procedimiento que en las secciones
+                if j < len(subsections) - 1:
+                    next_subsection = subsections[j + 1]
+                    subsection_text = rest[rest.index(subsections[j]):rest.index(next_subsection)]
+                else:
+                    subsection_text = rest[rest.index(subsections[j]):]
+                
+            
+                subsection_match = self.subsection_re.match(subsection_text)
+                subsection_dic = subsection_match.groupdict()
+                
+                document["sections"][i]["subsections"].append(subsection_dic)
+                
 
         # COMPLETAR
 
