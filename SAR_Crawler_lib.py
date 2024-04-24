@@ -152,10 +152,27 @@ class SAR_Wiki_Crawler:
         """
         def clean_text(txt):
             return '\n'.join(l for l in txt.split('\n') if len(l) > 0)
+        
+        text = clean_text(text)
+        match = self.title_sum_re.match(text)
+        document = match.groupdict()
+        rest = document["rest"]
+        del(document["rest"])
+        sections = self.sections_re.findall(rest)
+        document["sections"] = []
+        
 
-        document = None
+        for i in range(len(sections) - 1):
+            next_section = sections[i + 1] if sections[i + 1] else None
+            section_match = self.section_re.match(rest, rest.index(sections[i]), rest.index(next_section))
+            section_dic = section_match.groupdict()
+            del(section_dic["rest"])
+            section_dic["subsections"] = []
+            document["sections"].append(section_dic)
 
         # COMPLETAR
+
+       
 
         return document
 
