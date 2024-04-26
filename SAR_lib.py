@@ -465,11 +465,15 @@ class SAR_Indexer:
         return: posting list con todos los artid exceptos los contenidos en p
 
         """
-        
-        pass
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
+        j=0
+        all = self.articles.keys()
+        l = []
+        for i in self.articles.keys():
+            if i != p[j]:
+                l.append(i)
+        return l
+
+
 
 
 
@@ -485,7 +489,21 @@ class SAR_Indexer:
         return: posting list con los artid incluidos en p1 y p2
 
         """
-        
+        i,j = 0,0
+        l = []
+        while i < len(p1) and j < len(p2):
+            if p1[i] == p2[j]:
+                i+=1
+                j+=1
+                l.append(p1[i])
+            if p1[i] < p2[j]:
+                i+=1
+            else:
+                j+=1
+        l += p1[i:]
+        l += p2[j:]
+        return l
+
         pass
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
@@ -505,7 +523,22 @@ class SAR_Indexer:
         return: posting list con los artid incluidos de p1 o p2
 
         """
-
+        i, j = 0, 0
+        l = []
+        while i < len(p1) and j < len(p2):
+            if p1[i] == p2[j]:
+                i += 1
+                j += 1
+                l.append(p1[i])
+            if p1[i] < p2[j]:
+                i += 1
+                l.append(p1[j])
+            else:
+                j += 1
+                l.append(p2[i])
+        l += p1[i:]
+        l += p2[j:]
+        return l
         pass
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
