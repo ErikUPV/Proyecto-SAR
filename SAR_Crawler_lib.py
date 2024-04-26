@@ -299,10 +299,11 @@ class SAR_Wiki_Crawler:
                 
                 documents.append(self.parse_wikipedia_textual_content(content, f"{base_url}{article_url}"))
                 total_documents_captured += 1
-                if len(documents) == batch_size:
+                if len(documents) == batch_size or total_documents_captured == document_limit or depth == max_depth_level:
+                    files_count += 1
                     self.save_documents(documents, base_filename=base_filename, num_file=files_count, total_files=total_files)
                     documents = []
-                    files_count += 1
+                    
                 for url in urls_from_article:
                     if self.is_valid_url(url):
                         hq.heappush(queue, (depth + 1, "https://es.wikipedia.org", url))
