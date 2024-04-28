@@ -361,7 +361,105 @@ class SAR_Indexer:
 
         if query is None or len(query) == 0:
             return []
+        '''
+        query = query.split()
+        pila = [[]]
+        i = 0
+        c = 0
+        while i < len(query):
+            if query[i] != 'AND' or query[i] != 'OR':
+                i += 1
+                print(aux)
+                pila[-1] = self.and_posting(pila[-1], aux)
+            elif query[i] == 'OR':
+                i += 1
+                if query[i] == 'NOT':
+                    i += 1
+                    aux = self.reverse_posting(self.get_posting(query[i]))
+                else:
+                    aux = self.get_posting(query[i])
+                print(aux)
+                pila[-1] = self.or_posting(pila[-1], aux)
+            elif query[i] == 'NOT':
+                i += 1
+                pila[-1] = self.reverse_posting(query[i])
+            else:
+                pila[-1] = self.get_posting(query[i])
+            i += 1
+        return pila[0]'''
+        query = self.depurar(query)
+        if query[0] == 'NOT':
+            n = query[1]
+            q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
+                else n
+            q = self.reverse_posting(self.get_posting(q))
+            i = 2
+        else:
+            n = query[0]
+            q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
+                else n
+            q = self.get_posting(q)
+            i = 1
+        c = 0
+        while i < len(query):
+            if query[i] == 'AND' or query[i] == 'OR':
+                if query[i + 1] == 'NOT':
+                    c = 1
+                    n = query[i + 1 + c]
+                    aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
+                        else n
+                    q = self.reverse_posting(self.get_posting(q))
+                else:
+                    n = query[i + 1]
+                    aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
+                        else n
+                    q = self.get_posting(q)
 
+                if query[i] == 'AND':
+                    i += 1
+                    print(aux)
+                    q = self.and_posting(q, aux)
+                elif query[i] == 'OR':
+                    i += 1
+                    print(aux)
+                    q = self.or_posting(q, aux)
+                i += c
+                c = 0
+            else:
+                if query[i] == 'NOT':
+                    n = query[i + 1]
+                    q = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
+                        else n
+                    q = self.reverse_posting(self.get_posting(q))
+                    i += 1
+                else:
+                    n = query[i]
+                    q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
+                        else n
+                    q = self.get_posting(q)
+            i += 1
+        print(q)
+        return q
+
+        def depurar(l):
+            l = l.split()
+            c = 0
+            aux = []
+            res = []
+            for i in l:
+                if i[0] == '(':
+                    c += 1
+                    aux.append(i)
+                elif i[-1] == ')':
+                    c -= 1
+                    aux.append(i)
+                    res.append(' '.join(aux))
+                    aux = []
+                elif c == 0:
+                    res.append(i)
+                else:
+                    aux.append(i)
+            return res
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
@@ -374,9 +472,9 @@ class SAR_Indexer:
 
         Devuelve la posting list asociada a un termino. 
         Dependiendo de las ampliaciones implementadas "get_posting" puede llamar a:
-            - self.get_positionals: para la ampliacion de posicionales
-            - self.get_permuterm: para la ampliacion de permuterms
-            - self.get_stemming: para la amplaicion de stemming
+            - self.get_positionals: para la ampliacion de posicionales (None)
+            - self.get_permuterm: para la ampliacion de permuterms ('p')
+            - self.get_stemming: para la amplaicion de stemming ('s')
 
 
         param:  "term": termino del que se debe recuperar la posting list.
@@ -387,6 +485,14 @@ class SAR_Indexer:
         NECESARIO PARA TODAS LAS VERSIONES
 
         """
+
+        if field == None:
+            l = self.get_positionals(term)
+        elif field=='s':
+            l = self.get_stemming(term)
+        elif field=='p':
+            l = self.get_permuterm(term)
+        return l
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
@@ -465,10 +571,9 @@ class SAR_Indexer:
         return: posting list con todos los artid exceptos los contenidos en p
 
         """
-        j=0
         all = self.articles.keys()
         l = []
-        for i in self.articles.keys():
+        for i in all:
             if i != p[j]:
                 l.append(i)
         return l
@@ -504,7 +609,6 @@ class SAR_Indexer:
         l += p2[j:]
         return l
 
-        pass
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
