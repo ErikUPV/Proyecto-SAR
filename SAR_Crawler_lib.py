@@ -295,9 +295,9 @@ class SAR_Wiki_Crawler:
             if article_url not in visited and self.is_valid_url(article_url):
                 print(article_url)
                 visited.add(article_url)
-                content, urls_from_article = self.get_wikipedia_entry_content(f"{base_url}{article_url}")
+                content, urls_from_article = self.get_wikipedia_entry_content(f"https://es.wikipedia.org{article_url}")
                 
-                documents.append(self.parse_wikipedia_textual_content(content, f"{base_url}{article_url}"))
+                documents.append(self.parse_wikipedia_textual_content(content, f"https://es.wikipedia.org{article_url}"))
                 total_documents_captured += 1
                 if len(documents) == batch_size or total_documents_captured == document_limit or depth == max_depth_level:
                     files_count += 1
@@ -306,7 +306,7 @@ class SAR_Wiki_Crawler:
                     
                 for url in urls_from_article:
                     if self.is_valid_url(url):
-                        hq.heappush(queue, (depth + 1, "https://es.wikipedia.org", url))
+                        hq.heappush(queue, (depth + 1, article_url, f"https://es.wikipedia.org{url}"))
 
     def wikipedia_crawling_from_url(self,
         initial_url: str, document_limit: int, base_filename: str,
