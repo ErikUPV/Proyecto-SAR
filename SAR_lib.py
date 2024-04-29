@@ -408,20 +408,18 @@ class SAR_Indexer:
                     n = query[i + 1 + c]
                     aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
                         else n
-                    q = self.reverse_posting(self.get_posting(q))
+                    aux = self.reverse_posting(self.get_posting(aux))
                 else:
                     n = query[i + 1]
                     aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                         else n
-                    q = self.get_posting(q)
+                    aux = self.get_posting(aux)
 
                 if query[i] == 'AND':
                     i += 1
-                    print(aux)
                     q = self.and_posting(q, aux)
                 elif query[i] == 'OR':
                     i += 1
-                    print(aux)
                     q = self.or_posting(q, aux)
                 i += c
                 c = 0
@@ -438,7 +436,6 @@ class SAR_Indexer:
                         else n
                     q = self.get_posting(q)
             i += 1
-        print(q)
         return q
 
         def depurar(l):
