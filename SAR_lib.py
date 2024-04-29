@@ -561,18 +561,19 @@ class SAR_Indexer:
         Devuelve una posting list con todas las noticias excepto las contenidas en p.
         Util para resolver las queries con NOT.
 
-
         param:  "p": posting list
 
-
         return: posting list con todos los artid exceptos los contenidos en p
-
         """
-        all = self.articles.keys()
+
+        j = 0
+        allP = self.articles.keys()
         l = []
-        for i in all:
+        for i in allP:
             if i != p[j]:
                 l.append(i)
+        # l = [i for i in allP if i not in p]
+
         return l
 
 
@@ -587,11 +588,10 @@ class SAR_Indexer:
 
         param:  "p1", "p2": posting lists sobre las que calcular
 
-
         return: posting list con los artid incluidos en p1 y p2
-
         """
-        i,j = 0,0
+
+        i, j = 0, 0
         l = []
         while i < len(p1) and j < len(p2):
             if p1[i] == p2[j]:
@@ -620,9 +620,7 @@ class SAR_Indexer:
 
         param:  "p1", "p2": posting lists sobre las que calcular
 
-
         return: posting list con los artid incluidos de p1 o p2
-
         """
         i, j = 0, 0
         l = []
@@ -640,7 +638,6 @@ class SAR_Indexer:
         l += p1[i:]
         l += p2[j:]
         return l
-        pass
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
@@ -655,13 +652,9 @@ class SAR_Indexer:
 
         param:  "p1", "p2": posting lists sobre las que calcular
 
-
         return: posting list con los artid incluidos de p1 y no en p2
-
         """
-
-        
-        pass
+        return [i for i in p1 if i not in p2]
         ########################################################
         ## COMPLETAR PARA TODAS LAS VERSIONES SI ES NECESARIO ##
         ########################################################
@@ -717,9 +710,8 @@ class SAR_Indexer:
         param:  "query": query que se debe resolver.
 
         return: el numero de artículo recuperadas, para la opcion -T
-
         """
-        pass
+        return len(self.solve_query(query))
         ################
         ## COMPLETAR  ##
         ################
