@@ -220,7 +220,6 @@ class SAR_Indexer:
     
     def index_file(self, filename:str):
         """
-
         Indexa el contenido de un fichero.
         
         input: "filename" es el nombre de un fichero generado por el Crawler cada línea es un objeto json
@@ -229,46 +228,43 @@ class SAR_Indexer:
         NECESARIO PARA TODAS LAS VERSIONES
 
         dependiendo del valor de self.multifield y self.positional se debe ampliar el indexado
-
-
         """
-        
-        num_fich = len(self.docs) + 1
-        self.docs[num_fich] = os.path.abspath(filename)
-        
-        for i, line in enumerate(open(filename)):
-            j = self.parse_article(line)
-            self.urls.add(j["url"])
-            tokens = self.tokenize(j['all'])
-            
-            
-            artid = int(f"{num_fich}{i}")
-            self.articles[artid] = i
-            
-            for token in tokens:
-                if self.index.get(token, None) == None:
-                    self.index[token] = []
-                if artid not in self.index[token]:
-                    self.index[token].append(artid)
-                  
-                    
-                
-            
-            
-            
-            
-            
-
-
-        #
-        # 
         # En la version basica solo se debe indexar el contenido "article"
-        #
-        #
-        #
         #################
         ### COMPLETAR ###
         #################
+        
+        # ======== Actializar valores del indice ========
+        docId = len(self.docs) 
+        self.docs[docId] = os.path.abspath(filename)
+        
+        for lineInFile, line in enumerate(open(filename)):
+            # Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
+            text = self.parse_article(line)
+            tokens = self.tokenize(text['all'])
+            
+            # ======== Actializar valores del indice ========
+            artId = len(self.articles)
+            self.articles[artId] = (docId,lineInFile)
+            self.urls.add(text["url"])
+                
+            
+            for token in tokens:
+                # ======== Actializar valores del indice ========
+                if token not in self.weight:
+                    # Si el token no tiene contador añadirlo
+                    self.index[token] = 1
+                else:
+                    self.index[token] += 1
+                    
+                # ======== Actializar el indice ========
+                if token not in self.index:
+                    # Si el token no está en el indice añadirlo
+                    self.index[token] = []
+                    
+                if artId not in self.index[token]:
+                    # Añadir el articulo en orden creciente
+                    self.index[token].append(artId)
 
 
 
