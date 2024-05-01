@@ -235,21 +235,21 @@ class SAR_Indexer:
         #################
         
         # ======== Actializar valores del indice ========
-        docId = len(self.docs) 
+        docId: int = len(self.docs) 
         self.docs[docId] = os.path.abspath(filename)
         
         for lineInFile, line in enumerate(open(filename)):
             # Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
-            text = self.parse_article(line)
-            tokens = self.tokenize(text['all'])
+            text: str = self.parse_article(line)
+            tokens: list = self.tokenize(text['all'])
             
             # ======== Actializar valores del indice ========
-            artId = len(self.articles)
+            artId: int = len(self.articles)
             self.articles[artId] = (docId,lineInFile)
             self.urls.add(text["url"])
                 
             
-            for token in tokens:
+            for i, token in enumerate(tokens):
                 # ======== Actializar valores del indice ========
                 if token not in self.weight:
                     # Si el token no tiene contador añadirlo
@@ -262,9 +262,21 @@ class SAR_Indexer:
                     # Si el token no está en el indice añadirlo
                     self.index[token] = []
                     
-                if artId not in self.index[token]:
-                    # Añadir el articulo en orden creciente
-                    self.index[token].append(artId)
+                # Poscionales 
+                if not self.positional:
+                    # NORMAL 
+                    if artId not in self.index[token]:
+                        # Añadir el articulo en orden creciente
+                        self.index[token].append(artId) 
+                else:
+                    # POSICIONALES -> cada termino tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...]                       
+                    if artId not in self.index[token]:
+                        # Añadir el articulo en orden creciente con su lista de posicionales
+                        self.index[token].append((artId,[i]))
+                    else:
+                        # Añadir posición de la ocurrencia al índice
+                        self.index[token][1].append(i)
+                    
 
 
 
@@ -307,15 +319,21 @@ class SAR_Indexer:
 
         "self.stemmer.stem(token) devuelve el stem del token"
 
-
         """
-        
-        pass
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
-
-
+        
+        # recuperar los tokens y sacarles sus steams.
+        for token in self.index.keys():
+            stem: str = self.stemmer.stem(token)
+            
+            if stem not in self.sindex:
+                self.sindex[stem] = []
+            
+            if token not in self.sindex[stem]:
+                self.sindex[stem].append(token)
+         
     
     def make_permuterm(self):
         """
@@ -532,11 +550,63 @@ class SAR_Indexer:
         return: posting list
 
         """
-        pass
         ########################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE POSICIONALES ##
         ########################################################
+        def getOcurrencias(artId: int, posting: list) -> Optional[list]: 
+            '''
+            devuelve las ocurrencias de un articulo entre una posting list de un token,
+            si NO aparece el articulo en la posting list devuelve None
+            
+            param:  "artId": id del articulo a buscar en posting
+                    "posting": posting list sobre la que hacer la búsqueda                
+                
+            return: ocurrencias list or none
+            '''
+            for (id, ocurrencias) in posting:
+                if id == artId: return ocurrencias
+            return None
+            
+            
+        res = set()
+        terminos = self.tokenize(terms)
+        # Todas las posting list de cada termino de la consulta
+        postings = [self.index[posting] for posting in terminos]
 
+        # Iterar sobre todos los articulos que estén en la primera postingList
+        # si ya no aparecen en ella no serán devueltos en la consulta
+        # 
+        # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
+        for (artId,ocurrenciasArtId) in postings.pop(0): # Primera posting list
+            ValidoArtId: bool = True
+            
+            # mirar las ocurrencias en las listas asociadas a los siguientes términos
+            for posRelativa, posting in enumerate(postings):
+                econtradoPos: bool = False
+                
+                # Recuperar ocurrencias del siguiente token del artIds
+                ocurrenciasAux = getOcurrencias(artId,posting)
+                
+                # Si el articulo NO aparece en la posting list del siguiente token fuera
+                if ocurrenciasAux is None: 
+                    ValidoArtId = False
+                    break
+                
+                # Ver si en las posición que tendría que tener el siguiene token en el artículo está
+                for pos in ocurrenciasArtId:
+                    if (pos + posRelativa + 1) in ocurrenciasAux:
+                        econtradoPos = True
+                        break
+                '''End for mirar posiciones de cada artId'''
+                
+                ValidoArtId = econtradoPos
+                if not ValidoArtId : break             
+            '''End for mirar otras postings'''
+            
+            if ValidoArtId: 
+                res.add(artId)
+        '''End for mirar todos artId'''       
+        return sorted(set)
 
     def get_stemming(self, term:str, field: Optional[str]=None):
         """
@@ -550,12 +620,27 @@ class SAR_Indexer:
         return: posting list
 
         """
-        
-        stem = self.stemmer.stem(term)
-
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
+        
+        stem = self.stemmer.stem(term)
+        '''res = []'''
+        res = set()
+        
+        # Puede haber más de un tocken asociado a un stem
+        for token in self.sindex[stem]:
+            # Insertar de manera ordenada (de menor a mayor) en la respuesta los DocIds 
+            for docId in self.index[token]:
+                '''for i in range(len(res)):
+                    if res[i] <  docId: continue
+                    if res[i] == docId: break
+                    if res[i] >  docId: res.insert(i+1,docId)'''
+                res.add(docId)
+    
+        '''return res'''
+        return sorted(res)
+            
 
     def get_permuterm(self, term:str, field:Optional[str]=None):
         """
