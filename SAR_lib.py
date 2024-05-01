@@ -232,8 +232,32 @@ class SAR_Indexer:
 
 
         """
+        
+        num_fich = len(self.docs) + 1
+        self.docs[num_fich] = os.path.abspath(filename)
+        
         for i, line in enumerate(open(filename)):
             j = self.parse_article(line)
+            self.urls.add(j["url"])
+            tokens = self.tokenize(j['all'])
+            
+            
+            artid = int(f"{num_fich}{i}")
+            self.articles[artid] = i
+            
+            for token in tokens:
+                if self.index.get(token, None) == None:
+                    self.index[token] = []
+                if artid not in self.index[token]:
+                    self.index[token].append(artid)
+                  
+                    
+                
+            
+            
+            
+            
+            
 
 
         #
@@ -321,10 +345,13 @@ class SAR_Indexer:
         Muestra estadisticas de los indices
         
         """
-        pass
+        
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
+        with open("stats.json", mode='w+') as fl:
+            json.dump(self.index, fl)
+        #print(self.index)
 
         
 

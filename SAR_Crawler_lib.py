@@ -161,6 +161,7 @@ class SAR_Wiki_Crawler:
         #Gracias a la expresión regular el diccionario de grupos del objeto match
         #tiene como claves "name", "title" y "rest"
         document = match.groupdict()
+        document["url"] = url
         rest = document["rest"]
         #Nos guardamos rest en una variable y se borra del diccionario
         del(document["rest"])
@@ -287,18 +288,21 @@ class SAR_Wiki_Crawler:
             total_files = math.ceil(document_limit / batch_size)
 
         print(queue)
+        base_url = ""
         # COMPLETAR
         while queue and total_documents_captured <= document_limit and depth <= max_depth_level:
-            depth, base_url, article_url = hq.heappop(queue)
+            depth, _, article_url = hq.heappop(queue)
             print(depth, article_url)
             
             if article_url not in visited and self.is_valid_url(article_url):
                 print(article_url)
+                article_url = f"{base_url}{article_url}"
                 visited.add(article_url)
-                content, urls_from_article = self.get_wikipedia_entry_content(f"https://es.wikipedia.org{article_url}")
+                content, urls_from_article = self.get_wikipedia_entry_content(article_url)
                 
-                documents.append(self.parse_wikipedia_textual_content(content, f"https://es.wikipedia.org{article_url}"))
+                documents.append(self.parse_wikipedia_textual_content(content, article_url))
                 total_documents_captured += 1
+                base_url = "https://es.wikipedia.org"
                 if len(documents) == batch_size or total_documents_captured == document_limit or depth == max_depth_level:
                     files_count += 1
                     self.save_documents(documents, base_filename=base_filename, num_file=files_count, total_files=total_files)
@@ -306,7 +310,7 @@ class SAR_Wiki_Crawler:
                     
                 for url in urls_from_article:
                     if self.is_valid_url(url):
-                        hq.heappush(queue, (depth + 1, article_url, f"https://es.wikipedia.org{url}"))
+                        hq.heappush(queue, (depth + 1, article_url, url))
 
     def wikipedia_crawling_from_url(self,
         initial_url: str, document_limit: int, base_filename: str,
