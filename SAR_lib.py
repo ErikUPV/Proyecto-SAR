@@ -568,7 +568,7 @@ class SAR_Indexer:
             return None
             
             
-        res = set()
+        res = []
         terminos = self.tokenize(terms)
         # Todas las posting list de cada termino de la consulta
         postings = [self.index[posting] for posting in terminos]
@@ -604,9 +604,9 @@ class SAR_Indexer:
             '''End for mirar otras postings'''
             
             if ValidoArtId: 
-                res.add(artId)
-        '''End for mirar todos artId'''       
-        return sorted(set)
+                res.append(artId)
+        '''End for mirar todos artId''' 
+        return res # Ya está ordenado de menor a mayor
 
     def get_stemming(self, term:str, field: Optional[str]=None):
         """
