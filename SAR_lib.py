@@ -703,15 +703,13 @@ class SAR_Indexer:
         l = []
         while i < len(p1) and j < len(p2):
             if p1[i] == p2[j]:
-                i+=1
-                j+=1
                 l.append(p1[i])
-            if p1[i] < p2[j]:
-                i+=1
+                i += 1
+                j += 1
+            elif p1[i] < p2[j]:
+                i += 1
             else:
-                j+=1
-        l += p1[i:]
-        l += p2[j:]
+                j += 1
         return l
 
         ########################################
@@ -734,15 +732,15 @@ class SAR_Indexer:
         l = []
         while i < len(p1) and j < len(p2):
             if p1[i] == p2[j]:
-                i += 1
-                j += 1
                 l.append(p1[i])
-            if p1[i] < p2[j]:
                 i += 1
-                l.append(p1[j])
-            else:
                 j += 1
-                l.append(p2[i])
+            elif p1[i] < p2[j]:
+                l.append(p1[i])
+                i += 1
+            else:
+                l.append(p2[j])
+                j += 1
         l += p1[i:]
         l += p2[j:]
         return l
