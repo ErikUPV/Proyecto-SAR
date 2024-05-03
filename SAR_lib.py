@@ -497,6 +497,9 @@ class SAR_Indexer:
         NECESARIO PARA TODAS LAS VERSIONES
 
         """
+        ########################################
+        ## COMPLETAR PARA TODAS LAS VERSIONES ##
+        ########################################
 
         if field == None:
             l = self.get_positionals(term)
@@ -505,10 +508,6 @@ class SAR_Indexer:
         elif field=='p':
             l = self.get_permuterm(term)
         return l
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
-        pass
 
 
 
@@ -673,6 +672,9 @@ class SAR_Indexer:
         return: posting list con los artid incluidos en p1 y p2
         """
 
+        ########################################
+        ## COMPLETAR PARA TODAS LAS VERSIONES ##
+        ########################################
         i, j = 0, 0
         l = []
         while i < len(p1) and j < len(p2):
@@ -686,9 +688,6 @@ class SAR_Indexer:
                 j += 1
         return l
 
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
 
 
 
@@ -702,6 +701,10 @@ class SAR_Indexer:
 
         return: posting list con los artid incluidos de p1 o p2
         """
+
+        ########################################
+        ## COMPLETAR PARA TODAS LAS VERSIONES ##
+        ########################################
         i, j = 0, 0
         l = []
         while i < len(p1) and j < len(p2):
@@ -718,9 +721,6 @@ class SAR_Indexer:
         l += p1[i:]
         l += p2[j:]
         return l
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
 
 
     def minus_posting(self, p1, p2):
@@ -734,10 +734,10 @@ class SAR_Indexer:
 
         return: posting list con los artid incluidos de p1 y no en p2
         """
-        return [i for i in p1 if i not in p2]
         ########################################################
         ## COMPLETAR PARA TODAS LAS VERSIONES SI ES NECESARIO ##
         ########################################################
+        return [i for i in p1 if i not in p2]
 
 
 
