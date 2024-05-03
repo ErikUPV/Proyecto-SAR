@@ -399,35 +399,12 @@ class SAR_Indexer:
         return: posting list con el resultado de la query
 
         """
+        ########################################
+        ## COMPLETAR PARA TODAS LAS VERSIONES ##
+        ########################################
 
         if query is None or len(query) == 0:
             return []
-        '''
-        query = query.split()
-        pila = [[]]
-        i = 0
-        c = 0
-        while i < len(query):
-            if query[i] != 'AND' or query[i] != 'OR':
-                i += 1
-                print(aux)
-                pila[-1] = self.and_posting(pila[-1], aux)
-            elif query[i] == 'OR':
-                i += 1
-                if query[i] == 'NOT':
-                    i += 1
-                    aux = self.reverse_posting(self.get_posting(query[i]))
-                else:
-                    aux = self.get_posting(query[i])
-                print(aux)
-                pila[-1] = self.or_posting(pila[-1], aux)
-            elif query[i] == 'NOT':
-                i += 1
-                pila[-1] = self.reverse_posting(query[i])
-            else:
-                pila[-1] = self.get_posting(query[i])
-            i += 1
-        return pila[0]'''
         query = self.depurar(query)
         if query[0] == 'NOT':
             n = query[1]
@@ -498,9 +475,6 @@ class SAR_Indexer:
                 else:
                     aux.append(i)
             return res
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
 
 
 
