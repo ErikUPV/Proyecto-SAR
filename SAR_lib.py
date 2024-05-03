@@ -399,35 +399,12 @@ class SAR_Indexer:
         return: posting list con el resultado de la query
 
         """
+        ########################################
+        ## COMPLETAR PARA TODAS LAS VERSIONES ##
+        ########################################
 
         if query is None or len(query) == 0:
             return []
-        '''
-        query = query.split()
-        pila = [[]]
-        i = 0
-        c = 0
-        while i < len(query):
-            if query[i] != 'AND' or query[i] != 'OR':
-                i += 1
-                print(aux)
-                pila[-1] = self.and_posting(pila[-1], aux)
-            elif query[i] == 'OR':
-                i += 1
-                if query[i] == 'NOT':
-                    i += 1
-                    aux = self.reverse_posting(self.get_posting(query[i]))
-                else:
-                    aux = self.get_posting(query[i])
-                print(aux)
-                pila[-1] = self.or_posting(pila[-1], aux)
-            elif query[i] == 'NOT':
-                i += 1
-                pila[-1] = self.reverse_posting(query[i])
-            else:
-                pila[-1] = self.get_posting(query[i])
-            i += 1
-        return pila[0]'''
         query = self.depurar(query)
         if query[0] == 'NOT':
             n = query[1]
@@ -498,9 +475,6 @@ class SAR_Indexer:
                 else:
                     aux.append(i)
             return res
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
 
 
 
@@ -523,6 +497,9 @@ class SAR_Indexer:
         NECESARIO PARA TODAS LAS VERSIONES
 
         """
+        ########################################
+        ## COMPLETAR PARA TODAS LAS VERSIONES ##
+        ########################################
 
         if field == None:
             l = self.get_positionals(term)
@@ -531,10 +508,6 @@ class SAR_Indexer:
         elif field=='p':
             l = self.get_permuterm(term)
         return l
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
-        pass
 
 
 
@@ -699,24 +672,22 @@ class SAR_Indexer:
         return: posting list con los artid incluidos en p1 y p2
         """
 
+        ########################################
+        ## COMPLETAR PARA TODAS LAS VERSIONES ##
+        ########################################
         i, j = 0, 0
         l = []
         while i < len(p1) and j < len(p2):
             if p1[i] == p2[j]:
-                i+=1
-                j+=1
                 l.append(p1[i])
-            if p1[i] < p2[j]:
-                i+=1
+                i += 1
+                j += 1
+            elif p1[i] < p2[j]:
+                i += 1
             else:
-                j+=1
-        l += p1[i:]
-        l += p2[j:]
+                j += 1
         return l
 
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
 
 
 
@@ -730,25 +701,26 @@ class SAR_Indexer:
 
         return: posting list con los artid incluidos de p1 o p2
         """
+
+        ########################################
+        ## COMPLETAR PARA TODAS LAS VERSIONES ##
+        ########################################
         i, j = 0, 0
         l = []
         while i < len(p1) and j < len(p2):
             if p1[i] == p2[j]:
-                i += 1
-                j += 1
                 l.append(p1[i])
-            if p1[i] < p2[j]:
                 i += 1
-                l.append(p1[j])
-            else:
                 j += 1
-                l.append(p2[i])
+            elif p1[i] < p2[j]:
+                l.append(p1[i])
+                i += 1
+            else:
+                l.append(p2[j])
+                j += 1
         l += p1[i:]
         l += p2[j:]
         return l
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
 
 
     def minus_posting(self, p1, p2):
@@ -762,10 +734,10 @@ class SAR_Indexer:
 
         return: posting list con los artid incluidos de p1 y no en p2
         """
-        return [i for i in p1 if i not in p2]
         ########################################################
         ## COMPLETAR PARA TODAS LAS VERSIONES SI ES NECESARIO ##
         ########################################################
+        return [i for i in p1 if i not in p2]
 
 
 
