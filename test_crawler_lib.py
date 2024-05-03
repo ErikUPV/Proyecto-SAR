@@ -40,15 +40,35 @@ import random
     
     print(f'Tiempo 1: {(t1-t0)/MAX:.8f}')
     print(f'Tiempo 2: {(t2-t1)/MAX:.8f}')'''
+'''if __name__ == "__main__":
+    lista = [-1,-12,1,1,1,1,-5,0,1,5,10,20,30,50,124,2,-2,-21]
+    res = []
+    print(f'{res = }')
+    for docId in lista:
+        if len(res) == 0:
+            res.append(docId)
+            continue
+        if docId > res[len(res)-1]: 
+            # si va en la última posicion
+            res.insert(len(res),docId)
+            continue
+        
+        for i in range(len(res)):
+            if res[i] <  docId: continue
+            if res[i] == docId: break
+            if res[i] >  docId: res.insert(i,docId); break
+    print(f'{res = }')'''
 if __name__ == "__main__":
-    lista: list = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
-    ]
-    
-    primLista: list = lista.pop(0)
-    
-    print(f'{primLista = }')
-    print(f'{lista = }')
+    diccionario: dict = {
+        1: 1,
+        2: 4,
+        5: 10
+    }
+    if 1 in diccionario:
+        print('Yes it is')
+    else:
+        print('No it isn`t')
+    print(f'{diccionario[1] = }')
+    diccionario[1] = 10
+    print(f'{diccionario[1] = }')
     
