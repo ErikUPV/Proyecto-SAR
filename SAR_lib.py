@@ -255,7 +255,7 @@ class SAR_Indexer:
                     # Si el token no tiene contador añadirlo
                     self.index[token] = 1
                 else:
-                    self.index[token] += 1
+                    self.index['all'][token] += 1
                     
                 # ======== Actializar el indice ========
                 if token not in self.index:
