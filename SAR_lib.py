@@ -233,7 +233,10 @@ class SAR_Indexer:
         #################
         ### COMPLETAR ###
         #################
-        
+        # ======== Inicializar los diccionarios del índice ========
+        for (field,_) in self.fields:
+            self.index[field] = {}
+            
         # ======== Actializar valores del indice ========
         docId: int = len(self.docs) 
         self.docs[docId] = os.path.abspath(filename)
