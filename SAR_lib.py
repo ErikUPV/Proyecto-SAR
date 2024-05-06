@@ -255,7 +255,7 @@ class SAR_Indexer:
             
             # ======== Actualizar los indices ========
             for (field,ifIndex) in self.fields:
-                if  not self.multifield and field != 'all': continue
+                if not self.multifield and field != 'all': continue
                 if not ifIndex: continue
                 
                 tokens: list = self.tokenize(text[field])
