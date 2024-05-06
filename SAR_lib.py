@@ -47,7 +47,13 @@ class SAR_Indexer:
         self.sindex = {} # hash para el indice invertido de stems --> clave: stem, valor: lista con los terminos que tienen ese stem
         self.ptindex = {} # hash para el indice permuterm.
         self.docs = {} # diccionario de terminos --> clave: entero(docid),  valor: ruta del fichero.
-        self.weight = {} # hash de terminos para el pesado, ranking de resultados.
+        self.weight = {} # hash de terminos para el pesado, ranking de resultados. 
+        ''' 
+        Para cada termino
+        'frec': Cuantas veces se ha visto el término en la indexacióm
+        'nArt': Numero de art en los que aparece
+        'terDocFrec': Has para cada articulo, cuantas veces se ha visto ese token en cada articulo
+        '''         
         self.articles = {} # hash de articulos --> clave entero (artid), valor: la info necesaria para diferencia los artículos dentro de su fichero
         self.tokenizer = re.compile("\W+") # expresion regular para hacer la tokenizacion
         self.stemmer = SnowballStemmer('spanish') # stemmer en castellano
@@ -277,11 +283,11 @@ class SAR_Indexer:
                             # Si el token no tiene contadores añadirlos
                             self.weight[token] = {
                                 'frec': 0,
-                                'nDocs': 0,  
-                                'terDocFrec': {} #Frecuencia del termino en el documento                        
+                                'nArt': 0,  
+                                'terDocFrec': {}                      
                             }          
                         '''En if'''
-                        self.weight[token]['nDocs'] += 1
+                        self.weight[token]['nArt'] += 1
                         self.weight[token]['terDocFrec'][artId] = 0
                         visitedTokens.append(token)
                     '''En if'''
