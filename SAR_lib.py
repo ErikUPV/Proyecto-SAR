@@ -243,7 +243,7 @@ class SAR_Indexer:
         
         for lineInFile, line in enumerate(open(filename)):
             # Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
-            text: str = self.parse_article(line)
+            text = self.parse_article(line)
             
             # ======== Actializar valores del indice ========
             artId: int = len(self.articles)
@@ -255,6 +255,7 @@ class SAR_Indexer:
             
             # ======== Actualizar los indices ========
             for (field,ifIndex) in self.fields:
+                if  not self.multifield and field != 'all': continue
                 if not ifIndex: continue
                 
                 tokens: list = self.tokenize(text[field])
@@ -368,11 +369,11 @@ class SAR_Indexer:
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
         for field in self.index: 
-            if field != "url":
+            if field[0] != "url":
                 for token in field:
                     for i in range(len(token)+1):
-                        self.ptindex[field].append((f'{token[i:]}${token[:i]}',token))
-                self.ptindex[field].sort()
+                        self.ptindex[field[1]].append((f'{token[i:]}${token[:i]}',token))
+                self.ptindex[field[1]].sort()
 
 
 
@@ -396,7 +397,12 @@ class SAR_Indexer:
         res+=f"Number of indexed articles {len(self.articles)}\n"
         res+=f"{sep2}\n"
         res+="TOKENS:\n"
-        res+=f"\# of tokens in 'all': {len(self.index['all'])}\n"
+        if self.multifield:
+            for field in self.fields:
+                if field[1]:
+                    res+=str(field)
+                    res+=f"\# of tokens in '{field[0]}': {len(self.index[field[0]].keys())}\n"
+        else: res+=f"\# of tokens in 'all': {len(self.index['all'])}\n"
         res+=f"{sep1}\n"
         print(f"{self.positional} hola")
         if self.positional:
