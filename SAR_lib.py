@@ -451,27 +451,49 @@ class SAR_Indexer:
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
         def depurar(l):
-            l = self.tokenize(l)
+            l = l.lower().split()
+            parentesis = False
+            multi = False
             c = 0
+            s = 0
             aux = []
             res = []
             for i in l:
-                if i[0] == '(':
-                    c += 1
-                    aux.append(i)
-                elif i[-1] == ')':
-                    c -= 1
-                    aux.append(i)
-                    res.append(' '.join(aux))
-                    aux = []
-                elif c == 0:
+                if not multi:
+                    if i[0] == '(':
+                        c += 1
+                        aux.append(i)
+                        parentesis = True
+                    elif i[-1] == ')':
+                        c -= 1
+                        aux.append(i)
+                        res.append(' '.join(aux))
+                        aux = []
+                    elif c>0:
+                        aux.append(i)
+                if not parentesis:
+                    if i[0] == "'":
+                        s += 1
+                        aux.append(i)
+                        multi = True
+                    elif i[-1] == "'":
+                        s -= 1
+                        aux.append(i)
+                        res.append(' '.join(aux))
+                        aux = []
+                    elif s>0:
+                        aux.append(i)
+                if s == 0 and not (parentesis or multi):
+                    multi = False
                     res.append(i)
-                else:
-                    aux.append(i)
+                elif c == 0 and not (parentesis or multi):
+                    parentesis = False
+                    res.append(i)
             return res
 
         if query is None or len(query) == 0:
             return []
+
         query = depurar(query)
         if query[0] == 'not':
             n = query[1]
@@ -490,8 +512,10 @@ class SAR_Indexer:
             if query[i] == 'and':
                 if query[i + 1] == 'not':
                     n = query[i + 2]
-                    aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
-                        else n
+                    if n[0] == '(':
+                        aux = self.solve_query(n[i:len(n) - 1])
+                    else:
+                        aux = n
                     q = self.minus_posting(q,self.get_posting(aux,'all'))
                     i+=2
                 else:
@@ -522,6 +546,7 @@ class SAR_Indexer:
             i += 1
 
         # Short
+
         return q
 
 
@@ -875,6 +900,7 @@ class SAR_Indexer:
         return: el numero de artículo recuperadas, para la opcion -T
         """
         q = self.solve_query(query)
+        
         for i in range(len(q) if self.show_all else min(10,len(q))):
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
