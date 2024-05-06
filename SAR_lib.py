@@ -474,13 +474,13 @@ class SAR_Indexer:
             n = query[1]
             q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                 else n
-            q = self.reverse_posting(self.get_posting(q,'title'))
+            q = self.reverse_posting(self.get_posting(q,'all'))
             i = 2
         else:
             n = query[0]
             q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                 else n
-            q = self.get_posting(q,'title')
+            q = self.get_posting(q,'all')
             i = 1
         c = 0
         while i < len(query):
@@ -490,12 +490,12 @@ class SAR_Indexer:
                     n = query[i + 1 + c]
                     aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
                         else n
-                    aux = self.reverse_posting(self.get_posting(aux,'title'))
+                    aux = self.reverse_posting(self.get_posting(aux,'all'))
                 else:
                     n = query[i + 1]
                     aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                         else n
-                    aux = self.get_posting(aux,'title')
+                    aux = self.get_posting(aux,'all')
 
                 if query[i] == 'and':
                     i += 1
@@ -510,13 +510,13 @@ class SAR_Indexer:
                     n = query[i + 1]
                     q = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
                         else n
-                    q = self.reverse_posting(self.get_posting(q,'title'))
+                    q = self.reverse_posting(self.get_posting(q,'all'))
                     i += 1
                 else:
                     n = query[i]
                     q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
                         else n
-                    q = self.get_posting(q,'title')
+                    q = self.get_posting(q,'all')
             i += 1
         return q
 
@@ -559,10 +559,13 @@ class SAR_Indexer:
             if pos:
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
-                return [artId for (artId,_) in self.index[field][term]]
+                if term not in self.index[field]:
+                    return []
+                else:
+                    return [artId for (artId,_) in self.index[field][term]]
             else:
                 # Si no hay ninguna opción activada
-                return self.index[field][term]
+                return self.index[field].get(term,[])
 
 
     def get_positionals(self, terms:str, field):
@@ -596,8 +599,14 @@ class SAR_Indexer:
             
             
         res = []
-        # Todas las posting list de cada termino de la consulta
-        postings = [self.index[field][termino] for termino in terms]
+        postings = []
+        for termino in terms:
+            if terms not in self.index[field][termino]:
+                # si algún termino NO ha sido indexado no se busca
+                return res
+            else:
+                # Todas las posting list de cada termino de la consulta
+                postings.append(self.index[field][termino])
 
         # Iterar sobre todos los articulos que estén en la primera postingList
         # si ya no aparecen en ella no serán devueltos en la consulta
@@ -652,6 +661,10 @@ class SAR_Indexer:
         
         stem = self.stemmer.stem(term)
         res = []
+        
+        if stem not in self.sindex[field]:
+            # si ese stem no se ha llegado a indexar
+            return res
         
         # Puede haber más de un tocen asociado a un stem
         for token in self.sindex[field][stem]:
