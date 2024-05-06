@@ -357,10 +357,16 @@ class SAR_Indexer:
 
 
         """
-        pass
+        
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
+        for field in self.index: 
+            if field != "url":
+                for token in field:
+                    for i in range(len(token)+1):
+                        self.ptindex[field].append((f'{token[i:]}${token[:i]}',token))
+                self.ptindex[field].sort()
 
 
 
@@ -659,7 +665,13 @@ class SAR_Indexer:
         ##################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
         ##################################################
-        pass
+        res = []
+        pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
+        permuterm = f'{term[pos+1:]}${term[:pos]}'
+        for value in self.ptindex[field].values():
+            if permuterm in value[0]:
+                res += self.index[field].value[1]
+        return res
 
 
 
