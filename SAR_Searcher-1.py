@@ -77,7 +77,7 @@ if __name__ == "__main__":
         if args.count is True:
             searcher.solve_and_count([args.query])
         else:
-            print(searcher.solve_and_show(args.query))
+            searcher.solve_and_show(args.query)
 
     else:
         # modo interactivo
