@@ -546,7 +546,7 @@ class SAR_Indexer:
         pos = len(self.tokenize(term)) > 1
         if pos:
             # Si hay más de una palabra en el termiod 
-            return self.get_positionals(term,field)
+            return self.get_positionals(self.tokenize(term),field)
         elif '*' in term or '?' in term:
             # Sin contineen alguno de los comodines para la búsqueda permuterm (* o ?)
             return self.get_permuterm(term,field)
@@ -594,9 +594,8 @@ class SAR_Indexer:
             
             
         res = []
-        terminos = self.tokenize(terms)
         # Todas las posting list de cada termino de la consulta
-        postings = [self.index[field][termino] for termino in terminos]
+        postings = [self.index[field][termino] for termino in terms]
 
         # Iterar sobre todos los articulos que estén en la primera postingList
         # si ya no aparecen en ella no serán devueltos en la consulta
