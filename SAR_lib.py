@@ -56,7 +56,13 @@ class SAR_Indexer:
         self.use_stemming = False # valor por defecto, se cambia con self.set_stemming()
         self.use_ranking = False  # valor por defecto, se cambia con self.set_ranking()
 
-
+        # ======== Inicializar los diccionarios del índice ========
+        for (field,_) in self.fields:
+            self.index[field] = {}
+            self.sindex[field] = {}
+            self.ptindex[field] = {}
+            
+        
     ###############################
     ###                         ###
     ###      CONFIGURACION      ###
@@ -233,9 +239,6 @@ class SAR_Indexer:
         #################
         ### COMPLETAR ###
         #################
-        # ======== Inicializar los diccionarios del índice ========
-        for (field,_) in self.fields:
-            self.index[field] = {}
             
         # ======== Actializar valores del indice ========
         docId: int = len(self.docs) 
@@ -339,8 +342,7 @@ class SAR_Indexer:
         ####################################################
         
         # recuperar los tokens y sacarles sus steams.
-        for (field,_) in self.fields:
-            self.stemmer[field] = {}
+        
             
         for (field,ifIndex) in self.fields:
             if not ifIndex: continue
@@ -472,13 +474,13 @@ class SAR_Indexer:
             n = query[1]
             q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                 else n
-            q = self.reverse_posting(self.get_posting(q,'title'))
+            q = self.reverse_posting(self.get_posting(q,'all'))
             i = 2
         else:
             n = query[0]
             q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                 else n
-            q = self.get_posting(q,'title')
+            q = self.get_posting(q,'all')
             i = 1
         c = 0
         while i < len(query):
@@ -488,12 +490,12 @@ class SAR_Indexer:
                     n = query[i + 1 + c]
                     aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
                         else n
-                    aux = self.reverse_posting(self.get_posting(aux,'title'))
+                    aux = self.reverse_posting(self.get_posting(aux,'all'))
                 else:
                     n = query[i + 1]
                     aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                         else n
-                    aux = self.get_posting(aux,'title')
+                    aux = self.get_posting(aux,'all')
 
                 if query[i] == 'and':
                     i += 1
@@ -508,13 +510,13 @@ class SAR_Indexer:
                     n = query[i + 1]
                     q = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
                         else n
-                    q = self.reverse_posting(self.get_posting(q,'title'))
+                    q = self.reverse_posting(self.get_posting(q,'all'))
                     i += 1
                 else:
                     n = query[i]
                     q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
                         else n
-                    q = self.get_posting(q,'title')
+                    q = self.get_posting(q,'all')
             i += 1
         return q
 
