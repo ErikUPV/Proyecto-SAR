@@ -871,11 +871,12 @@ class SAR_Indexer:
         return: el numero de artículo recuperadas, para la opcion -T
         """
         q = self.solve_query(query)
-        j = 0
-        for i in q:
-            doc = open(self.docs[self.articles[i][0]],"r")
-            doc = self.parse_article(doc.readlines()[self.articles[i][1]])
-            print(f"{j} ({i}) {doc['title']}: {doc['url']}")
+        for i in range(q if self.show_all else 10):
+            doc = open(self.docs[self.articles[q[i]][0]], "r")
+            doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
+            print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
+
+        print(f"Number of results: {len(q)}")
         return len(q)
         ################
         ## COMPLETAR  ##
