@@ -339,14 +339,20 @@ class SAR_Indexer:
         ####################################################
         
         # recuperar los tokens y sacarles sus steams.
-        for token in self.index['all'].keys():
-            stem: str = self.stemmer.stem(token)
+        for (field,_) in self.fields:
+            self.stemmer[field] = {}
             
-            if stem not in self.sindex:
-                self.sindex[stem] = []
+        for (field,ifIndex) in self.fields:
+            if not ifIndex: continue
             
-            if token not in self.sindex[stem]:
-                self.sindex[stem].append(token)
+            for token in self.index[field].keys():
+                stem: str = self.stemmer.stem(token)
+                
+                if stem not in self.sindex[field]:
+                    self.sindex[field][stem] = []
+                
+                if token not in self.sindex[field][stem]:
+                    self.sindex[field][stem].append(token)
          
     
     def make_permuterm(self):
@@ -646,7 +652,7 @@ class SAR_Indexer:
         res = []
         
         # Puede haber más de un tocen asociado a un stem
-        for token in self.sindex[stem]:
+        for token in self.sindex[field][stem]:
             # Insertar de manera ordenada (de menor a mayor) en la respuesta los DocIds 
             for docId in self.index[field][token]:
                 if len(res) == 0:
