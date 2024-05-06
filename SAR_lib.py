@@ -471,7 +471,7 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-        def depurar(l):
+        '''def depurar(l):
             l = l.lower().split()
             parentesis = False
             multi = False
@@ -514,7 +514,7 @@ class SAR_Indexer:
 
         if query is None or len(query) == 0:
             return []
-
+        queryO = query
         query = depurar(query)
         if query[0] == 'not':
             n = query[1]
@@ -566,9 +566,85 @@ class SAR_Indexer:
                 q = self.get_posting(q,'all')
             i += 1
 
-        # Short
+        def short(query,q):
+            query = re.findall(r'("[^"]+"|\w+)', query.lower())
+            query = [i for i in query if i not in ['and','or','not']]
+            idf = [math.log(len(self.articles) / len(self.get_posting(j))) for j in query]
+            for i in q:
+                itf = [1 + math.log(self.weight[j]['terDocFrec'][i]) for j in query]'''
+        query = re.findall(r"'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
+        op = []
+        docs = []
+        for i in query:
+            if i in {'and', 'not', 'or', '(', ')'}:
+                op.append(i)
+            else:
+                docs.append(self.get_posting(i,'all'))
+        w = [1 for i in docs]
+        if op[0] == '(':
+            res = [[], docs[0].copy()]
+            i = 1
+        else:
+            res = [docs[0].copy()]
+            i = 0
+        j = 1
+        temporal = []
+        while i < len(op):
+            if op[i] == 'and':
+                i += 1
+                if i < len(op) and op[i] == 'not':
+                    i += 1
+                    if i < len(op) and op[i] == '(':
+                        res.append(docs[j])
+                        i += 1
+                        temporal.append('except')
+                    else:
+                        res[-1] = self.minus_posting(res[-1], docs[j])
+                elif i < len(op) and op[i] == '(':
+                    res.append(docs[j])
+                    i += 1
+                    temporal.append('and')
+                else:
+                    res[-1] = self.and_posting(res[-1], docs[j])
+                j += 1
+            elif op[i] == 'or':
+                i += 1
+                if i < len(op) and op[i] == 'not':
+                    i += 1
+                    if i < len(op) and op[i] == '(':
+                        res.append(docs[j])
+                        i += 1
+                        temporal.append('ornot')
+                    else:
+                        res[-1] = self.or_posting(res[-1], self.reverse_posting(docs[j]))
+                elif i < len(op) and op[i] == '(':
+                    res.append(docs[j])
+                    i += 1
+                    temporal.append('or')
+                else:
+                    res[-1] = self.or_posting(res[-1], docs[j])
+                j += 1
+            else:
+                if op[i] == ')':
+                    t = temporal.pop() if len(temporal) > 0 else ''
+                    aux = res.pop()
+                    if t == 'and':
+                        res[-1] = self.and_posting(res[-1], aux)
+                    elif t == 'or':
+                        res[-1] = self.or_posting(res[-1], aux)
+                    elif t == 'except':
+                        res[-1] = self.minus_posting(res[-1], aux)
+                    elif t == 'ornot':
+                        res[-1] = self.or_posting(res[-1], self.reverse_posting(aux))
+                    else:
+                        res[-1] = aux
+                    i += 1
+        return res[0]
 
-        return q
+
+        # Short
+        #q = short(queryO,q)
+        #return q
 
 
 
