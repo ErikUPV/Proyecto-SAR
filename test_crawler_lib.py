@@ -64,11 +64,5 @@ if __name__ == "__main__":
         2: 4,
         5: 10
     }
-    if 1 in diccionario:
-        print('Yes it is')
-    else:
-        print('No it isn`t')
-    print(f'{diccionario[1] = }')
-    diccionario[1] = 10
-    print(f'{diccionario[1] = }')
+    print(diccionario[24])
     

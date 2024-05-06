@@ -557,10 +557,13 @@ class SAR_Indexer:
             if pos:
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
-                return [artId for (artId,_) in self.index[field][term]]
+                if term not in self.index[field]:
+                    return []
+                else:
+                    return [artId for (artId,_) in self.index[field][term]]
             else:
                 # Si no hay ninguna opción activada
-                return self.index[field][term]
+                return self.index[field].get(term,[])
 
 
     def get_positionals(self, terms:str, field):
@@ -594,8 +597,14 @@ class SAR_Indexer:
             
             
         res = []
-        # Todas las posting list de cada termino de la consulta
-        postings = [self.index[field][termino] for termino in terms]
+        postings = []
+        for termino in terms:
+            if terms not in self.index[field][termino]:
+                # si algún termino NO ha sido indexado no se busca
+                return res
+            else:
+                # Todas las posting list de cada termino de la consulta
+                postings.append(self.index[field][termino])
 
         # Iterar sobre todos los articulos que estén en la primera postingList
         # si ya no aparecen en ella no serán devueltos en la consulta
@@ -650,6 +659,10 @@ class SAR_Indexer:
         
         stem = self.stemmer.stem(term)
         res = []
+        
+        if stem not in self.sindex[field]:
+            # si ese stem no se ha llegado a indexar
+            return res
         
         # Puede haber más de un tocen asociado a un stem
         for token in self.sindex[field][stem]:
