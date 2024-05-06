@@ -445,62 +445,8 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-
-        if query is None or len(query) == 0:
-            return []
-        query = self.depurar(query)
-        if query[0] == 'NOT':
-            n = query[1]
-            q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
-                else n
-            q = self.reverse_posting(self.get_posting(q))
-            i = 2
-        else:
-            n = query[0]
-            q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
-                else n
-            q = self.get_posting(q)
-            i = 1
-        c = 0
-        while i < len(query):
-            if query[i] == 'AND' or query[i] == 'OR':
-                if query[i + 1] == 'NOT':
-                    c = 1
-                    n = query[i + 1 + c]
-                    aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
-                        else n
-                    aux = self.reverse_posting(self.get_posting(aux))
-                else:
-                    n = query[i + 1]
-                    aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
-                        else n
-                    aux = self.get_posting(aux)
-
-                if query[i] == 'AND':
-                    i += 1
-                    q = self.and_posting(q, aux)
-                elif query[i] == 'OR':
-                    i += 1
-                    q = self.or_posting(q, aux)
-                i += c
-                c = 0
-            else:
-                if query[i] == 'NOT':
-                    n = query[i + 1]
-                    q = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
-                        else n
-                    q = self.reverse_posting(self.get_posting(q))
-                    i += 1
-                else:
-                    n = query[i]
-                    q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
-                        else n
-                    q = self.get_posting(q)
-            i += 1
-        return q
-
         def depurar(l):
-            l = l.split()
+            l = self.tokenize(l)
             c = 0
             aux = []
             res = []
@@ -518,6 +464,60 @@ class SAR_Indexer:
                 else:
                     aux.append(i)
             return res
+
+        if query is None or len(query) == 0:
+            return []
+        query = depurar(query)
+        if query[0] == 'not':
+            n = query[1]
+            q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
+                else n
+            q = self.reverse_posting(self.get_posting(q,'title'))
+            i = 2
+        else:
+            n = query[0]
+            q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
+                else n
+            q = self.get_posting(q,'title')
+            i = 1
+        c = 0
+        while i < len(query):
+            if query[i] == 'and' or query[i] == 'or':
+                if query[i + 1] == 'not':
+                    c = 1
+                    n = query[i + 1 + c]
+                    aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
+                        else n
+                    aux = self.reverse_posting(self.get_posting(aux,'title'))
+                else:
+                    n = query[i + 1]
+                    aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
+                        else n
+                    aux = self.get_posting(aux,'title')
+
+                if query[i] == 'and':
+                    i += 1
+                    q = self.and_posting(q, aux)
+                elif query[i] == 'or':
+                    i += 1
+                    q = self.or_posting(q, aux)
+                i += c
+                c = 0
+            else:
+                if query[i] == 'not':
+                    n = query[i + 1]
+                    q = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
+                        else n
+                    q = self.reverse_posting(self.get_posting(q,'title'))
+                    i += 1
+                else:
+                    n = query[i]
+                    q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
+                        else n
+                    q = self.get_posting(q,'title')
+            i += 1
+        return q
+
 
 
 
@@ -542,18 +542,19 @@ class SAR_Indexer:
         """
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################      
-        if len(self.tokenize(term)) > 1: 
+        ########################################
+        pos = len(self.tokenize(term)) > 1
+        if pos:
             # Si hay más de una palabra en el termiod 
             return self.get_positionals(self.tokenize(term),field)
         elif '*' in term or '?' in term:
             # Sin contineen alguno de los comodines para la búsqueda permuterm (* o ?)
             return self.get_permuterm(term,field)
-        elif self.stemming: 
+        elif self.use_stemming:
             # Si está activado el stemming
             return self.get_stemming(term,field)
         else: 
-            if self.positional:
+            if pos:
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
                 if term not in self.index[field]:
