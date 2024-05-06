@@ -56,7 +56,13 @@ class SAR_Indexer:
         self.use_stemming = False # valor por defecto, se cambia con self.set_stemming()
         self.use_ranking = False  # valor por defecto, se cambia con self.set_ranking()
 
-
+        # ======== Inicializar los diccionarios del índice ========
+        for (field,_) in self.fields:
+            self.index[field] = {}
+            self.sindex[field] = {}
+            self.ptindex[field] = {}
+            
+        
     ###############################
     ###                         ###
     ###      CONFIGURACION      ###
@@ -233,9 +239,6 @@ class SAR_Indexer:
         #################
         ### COMPLETAR ###
         #################
-        # ======== Inicializar los diccionarios del índice ========
-        for (field,_) in self.fields:
-            self.index[field] = {}
             
         # ======== Actializar valores del indice ========
         docId: int = len(self.docs) 
@@ -255,7 +258,7 @@ class SAR_Indexer:
             
             # ======== Actualizar los indices ========
             for (field,ifIndex) in self.fields:
-                if  not self.multifield and field != 'all': continue
+                if not self.multifield and field != 'all': continue
                 if not ifIndex: continue
                 
                 tokens: list = self.tokenize(text[field])
@@ -339,8 +342,7 @@ class SAR_Indexer:
         ####################################################
         
         # recuperar los tokens y sacarles sus steams.
-        for (field,_) in self.fields:
-            self.stemmer[field] = {}
+        
             
         for (field,ifIndex) in self.fields:
             if not ifIndex: continue
