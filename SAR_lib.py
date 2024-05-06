@@ -472,13 +472,13 @@ class SAR_Indexer:
             n = query[1]
             q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                 else n
-            q = self.reverse_posting(self.get_posting(q,'title'))
+            q = self.reverse_posting(self.get_posting(q,'all'))
             i = 2
         else:
             n = query[0]
             q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                 else n
-            q = self.get_posting(q,'title')
+            q = self.get_posting(q,'all')
             i = 1
         c = 0
         while i < len(query):
@@ -488,12 +488,12 @@ class SAR_Indexer:
                     n = query[i + 1 + c]
                     aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
                         else n
-                    aux = self.reverse_posting(self.get_posting(aux,'title'))
+                    aux = self.reverse_posting(self.get_posting(aux,'all'))
                 else:
                     n = query[i + 1]
                     aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                         else n
-                    aux = self.get_posting(aux,'title')
+                    aux = self.get_posting(aux,'all')
 
                 if query[i] == 'and':
                     i += 1
@@ -508,13 +508,13 @@ class SAR_Indexer:
                     n = query[i + 1]
                     q = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
                         else n
-                    q = self.reverse_posting(self.get_posting(q,'title'))
+                    q = self.reverse_posting(self.get_posting(q,'all'))
                     i += 1
                 else:
                     n = query[i]
                     q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
                         else n
-                    q = self.get_posting(q,'title')
+                    q = self.get_posting(q,'all')
             i += 1
         return q
 
