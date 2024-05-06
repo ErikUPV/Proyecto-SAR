@@ -382,9 +382,21 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-        with open("stats.json", mode='w+') as fl:
-            json.dump(self.index, fl)
-        #print(self.index)
+        sep1 = "="*30; sep2 = "-"*30
+        res = ""
+        res+=f"{sep1}\n"
+        res+=f"Number of indexed files {len(self.docs)}\n"
+        res+=f"{sep2}\n"
+        res+=f"Number of indexed articles {len(self.articles)}\n"
+        res+=f"{sep2}\n"
+        res+="TOKENS:\n"
+        res+=f"\# of tokens in 'all': {len(self.index['all'])}\n"
+        res+=f"{sep1}\n"
+        print(f"{self.positional} hola")
+        if self.positional:
+            res+= "Positional queries are allowed"
+        else: res+= "Positional queries are NOT allowed"
+        print(res)
 
         
 
