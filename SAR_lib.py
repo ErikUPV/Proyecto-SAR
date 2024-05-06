@@ -248,6 +248,9 @@ class SAR_Indexer:
             # Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
             text = self.parse_article(line)
             
+            # Si ya se ha indexado este articulo
+            if text['url'] in self.urls: continue
+            
             # ======== Actializar valores del indice ========
             artId: int = len(self.articles)
             self.articles[artId] = (docId,lineInFile)
