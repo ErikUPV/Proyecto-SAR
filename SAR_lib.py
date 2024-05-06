@@ -179,7 +179,7 @@ class SAR_Indexer:
         elif file_or_dir.is_dir():
             # is a directory
             for d, _, files in os.walk(root):
-                for filename in files:
+                for filename in sorted(files):
                     if filename.endswith('.json'):
                         fullname = os.path.join(d, filename)
                         self.index_file(fullname)
@@ -243,7 +243,7 @@ class SAR_Indexer:
         
         for lineInFile, line in enumerate(open(filename)):
             # Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
-            text: str = self.parse_article(line)
+            text = self.parse_article(line)
             
             # ======== Actializar valores del indice ========
             artId: int = len(self.articles)
@@ -255,6 +255,7 @@ class SAR_Indexer:
             
             # ======== Actualizar los indices ========
             for (field,ifIndex) in self.fields:
+                if  not self.multifield and field != 'all': continue
                 if not ifIndex: continue
                 
                 tokens: list = self.tokenize(text[field])
@@ -338,14 +339,20 @@ class SAR_Indexer:
         ####################################################
         
         # recuperar los tokens y sacarles sus steams.
-        for token in self.index['all'].keys():
-            stem: str = self.stemmer.stem(token)
+        for (field,_) in self.fields:
+            self.stemmer[field] = {}
             
-            if stem not in self.sindex:
-                self.sindex[stem] = []
+        for (field,ifIndex) in self.fields:
+            if not ifIndex: continue
             
-            if token not in self.sindex[stem]:
-                self.sindex[stem].append(token)
+            for token in self.index[field].keys():
+                stem: str = self.stemmer.stem(token)
+                
+                if stem not in self.sindex[field]:
+                    self.sindex[field][stem] = []
+                
+                if token not in self.sindex[field][stem]:
+                    self.sindex[field][stem].append(token)
          
     
     def make_permuterm(self):
@@ -382,9 +389,26 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-        with open("stats.json", mode='w+') as fl:
-            json.dump(self.index, fl)
-        #print(self.index)
+        sep1 = "="*30; sep2 = "-"*30
+        res = ""
+        res+=f"{sep1}\n"
+        res+=f"Number of indexed files {len(self.docs)}\n"
+        res+=f"{sep2}\n"
+        res+=f"Number of indexed articles {len(self.articles)}\n"
+        res+=f"{sep2}\n"
+        res+="TOKENS:\n"
+        if self.multifield:
+            for field in self.fields:
+                if field[1]:
+                    res+=str(field)
+                    res+=f"\# of tokens in '{field[0]}': {len(self.index[field[0]].keys())}\n"
+        else: res+=f"\# of tokens in 'all': {len(self.index['all'])}\n"
+        res+=f"{sep1}\n"
+        print(f"{self.positional} hola")
+        if self.positional:
+            res+= "Positional queries are allowed"
+        else: res+= "Positional queries are NOT allowed"
+        print(res)
 
         
 
@@ -629,7 +653,7 @@ class SAR_Indexer:
         res = []
         
         # Puede haber más de un tocen asociado a un stem
-        for token in self.sindex[stem]:
+        for token in self.sindex[field][stem]:
             # Insertar de manera ordenada (de menor a mayor) en la respuesta los DocIds 
             for docId in self.index[field][token]:
                 if len(res) == 0:
