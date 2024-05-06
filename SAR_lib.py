@@ -487,40 +487,41 @@ class SAR_Indexer:
             i = 1
         c = 0
         while i < len(query):
-            if query[i] == 'and' or query[i] == 'or':
+            if query[i] == 'and':
                 if query[i + 1] == 'not':
-                    c = 1
-                    n = query[i + 1 + c]
+                    n = query[i + 2]
+                    aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
+                        else n
+                    q = self.minus_posting(q,self.get_posting(aux,'all'))
+                    i+=2
+                else:
+                    n = query[i + 1]
+                    aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
+                        else n
+                    q = self.and_posting(q,self.get_posting(aux,'all'))
+                    i+=1
+            elif query[i] == 'or':
+                if query[i + 1] == 'not':
+                    n = query[i + 2]
                     aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
                         else n
                     aux = self.reverse_posting(self.get_posting(aux,'all'))
+                    i += 2
                 else:
                     n = query[i + 1]
                     aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
                         else n
                     aux = self.get_posting(aux,'all')
-
-                if query[i] == 'and':
                     i += 1
-                    q = self.and_posting(q, aux)
-                elif query[i] == 'or':
-                    i += 1
-                    q = self.or_posting(q, aux)
-                i += c
-                c = 0
+                q = self.or_posting(q, aux)
             else:
-                if query[i] == 'not':
-                    n = query[i + 1]
-                    q = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
-                        else n
-                    q = self.reverse_posting(self.get_posting(q,'all'))
-                    i += 1
-                else:
-                    n = query[i]
-                    q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
-                        else n
-                    q = self.get_posting(q,'all')
+                n = query[i]
+                q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
+                    else n
+                q = self.get_posting(q,'all')
             i += 1
+
+        # Short
         return q
 
 
@@ -874,7 +875,7 @@ class SAR_Indexer:
         return: el numero de artículo recuperadas, para la opcion -T
         """
         q = self.solve_query(query)
-        for i in range(q if self.show_all else 10):
+        for i in range(len(q) if self.show_all else 10):
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
