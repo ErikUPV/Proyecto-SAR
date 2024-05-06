@@ -248,6 +248,9 @@ class SAR_Indexer:
             # Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
             text = self.parse_article(line)
             
+            # Tokens ya vistos en el artículo, para el pesado self.weight
+            visitedTokens: list = [] 
+            
             # Si ya se ha indexado este articulo
             if text['url'] in self.urls: continue
             
@@ -265,14 +268,26 @@ class SAR_Indexer:
                 if not ifIndex: continue
                 
                 tokens: list = self.tokenize(text[field])
-                                                
+                                                            
                 for pos, token in enumerate(tokens):
                     # ======== Actualizar valores del indice ========
-                    if token not in self.weight:
-                        # Si el token no tiene contador añadirlo
-                        self.weight[token] = 1
-                    else:
-                        self.weight[token] += 1
+                    # Si no se ha visto el token aún se inicializa. Si se ha visto antes se actualizan sus valores
+                    if token not in visitedTokens: 
+                        if token not in self.weight:
+                            # Si el token no tiene contadores añadirlos
+                            self.weight[token] = {
+                                'frec': 0,
+                                'nDocs': 0,  
+                                'terDocFrec': {} #Frecuencia del termino en el documento                        
+                            }          
+                        '''En if'''
+                        self.weight[token]['nDocs'] += 1
+                        self.weight[token]['terDocFrec'][artId] = 0
+                        visitedTokens.append(token)
+                    '''En if'''
+                    
+                    self.weight[token]['frec'] += 1
+                    self.weight[token]['terDocFrec'][artId] += 1
                         
                     # ======== Indices ========
                     if token not in self.index[field]:
