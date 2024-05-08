@@ -412,6 +412,7 @@ class SAR_Indexer:
         
         """
         
+         
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
@@ -422,19 +423,37 @@ class SAR_Indexer:
         res+=f"{sep2}\n"
         res+=f"Number of indexed articles {len(self.articles)}\n"
         res+=f"{sep2}\n"
-        res+="TOKENS:\n"
-        if self.multifield:
-            for field in self.fields:
-                if field[1]:
-                    res+=str(field)
-                    res+=f"\# of tokens in '{field[0]}': {len(self.index[field[0]].keys())}\n"
-        else: res+=f"\# of tokens in 'all': {len(self.index['all'])}\n"
-        res+=f"{sep1}\n"
-        print(f"{self.positional} hola")
+        
+        
+        
+        indices = ["tokens"]
+        print(self.sindex)
+        if(self.stemming): indices.append("stemming")
+        if(self.permuterm): indices.append("permuterm")
+        indice_dic = {}
+        for indice in indices:
+            res+=f"{indice.upper()}:\n"
+            if indice == "tokens": indice_dic = self.index
+            elif indice == "stemming": indice_dic = self.sindex
+            elif indice == "permuterm": indice_dic = self.ptindex
+            if self.multifield:
+                
+                for field in self.fields:
+                    if field[1]:
+                        res+=str(field)
+                        print(indice)
+                        res+=f"\# of tokens in '{field[0]}': {len(indice_dic[field[0]].keys())}\n"
+            else: res+=f"\# of tokens in 'all': {len(indice_dic['all'])}\n"
+            res+=f"{sep2}\n"
+        
+       
         if self.positional:
-            res+= "Positional queries are allowed"
-        else: res+= "Positional queries are NOT allowed"
+            res+= "Positional queries are allowed\n"
+        else: res+= "Positional queries are NOT allowed\n"
+        res+=f"{sep1}"
         print(res)
+
+
 
         
 
