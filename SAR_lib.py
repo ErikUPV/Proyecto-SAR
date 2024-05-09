@@ -317,7 +317,9 @@ class SAR_Indexer:
                             self.index[field][token][1].append(pos)
                 '''END FOR TOKENS'''              
             '''END FOR FIELDS'''              
-        '''END FOR LINES'''              
+        '''END FOR LINES'''
+        #if self.permuterm: self.make_permuterm()
+        if self.stemming: self.make_stemming()              
 
 
 
@@ -427,7 +429,6 @@ class SAR_Indexer:
         
         
         indices = ["tokens"]
-        print(self.sindex)
         if(self.stemming): indices.append("stemming")
         if(self.permuterm): indices.append("permuterm")
         indice_dic = {}
@@ -440,10 +441,9 @@ class SAR_Indexer:
                 
                 for field in self.fields:
                     if field[1]:
-                        res+=str(field)
                         print(indice)
-                        res+=f"\# of tokens in '{field[0]}': {len(indice_dic[field[0]].keys())}\n"
-            else: res+=f"\# of tokens in 'all': {len(indice_dic['all'])}\n"
+                        res+=f"\t# of tokens in '{field[0]}': {len(indice_dic[field[0]].keys())}\n"
+            else: res+=f"\t\# of tokens in 'all': {len(indice_dic['all'])}\n"
             res+=f"{sep2}\n"
         
        
