@@ -603,14 +603,16 @@ class SAR_Indexer:
             else:
                 docs.append(self.get_posting(i,'all'))
         w = [1 for i in docs]
+        j = 1
+        temporal = []
         if op[0] == '(':
+            if op[0]=='not':
+                temporal.append('not')
             res = [[], docs[0].copy()]
             i = 1
         else:
-            res = [docs[0].copy()]
+            res = [self.reverse_posting(docs[0].copy()) if op[0]=='not' else docs[0].copy()]
             i = 0
-        j = 1
-        temporal = []
         while i < len(op):
             if op[i] == 'and':
                 i += 1
@@ -658,6 +660,8 @@ class SAR_Indexer:
                         res[-1] = self.minus_posting(res[-1], aux)
                     elif t == 'ornot':
                         res[-1] = self.or_posting(res[-1], self.reverse_posting(aux))
+                    elif t == 'not':
+                        res[-1] = self.reverse_posting(aux)
                     else:
                         res[-1] = aux
                     i += 1
