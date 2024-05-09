@@ -66,7 +66,7 @@ class SAR_Indexer:
         for (field,_) in self.fields:
             self.index[field] = {}
             self.sindex[field] = {}
-            self.ptindex[field] = {}
+            self.ptindex[field] = []
             
         
     ###############################
@@ -319,7 +319,8 @@ class SAR_Indexer:
             '''END FOR FIELDS'''              
         '''END FOR LINES'''
         #if self.permuterm: self.make_permuterm()
-        if self.stemming: self.make_stemming()              
+        if self.stemming: self.make_stemming()
+        if self.permuterm: self.make_permuterm()             
 
 
 
@@ -396,15 +397,16 @@ class SAR_Indexer:
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
-        for field in self.index: 
-            if field != "url":
-                for token in field:
-                    for i in range(len(token)+1):
-                        self.ptindex[field].append((f'{token[i:]}${token[:i]}',token))
-                self.ptindex[field].sort()
-
-
-
+        print(self.ptindex.keys())
+        for field in self.ptindex: 
+            # if field == "url":
+            #     self.ptindex[field].extend([token for token in self.index[field].keys()])
+            #     self.ptindex[field] = list(set(self.ptindex[field]))
+            #     continue
+               
+            for token in self.index[field].keys():
+                self.ptindex[field].extend(sorted((f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1)))
+            self.ptindex[field] = list(set(self.ptindex[field]))
 
     def show_stats(self):
         """
@@ -433,6 +435,7 @@ class SAR_Indexer:
         if(self.permuterm): indices.append("permuterm")
         indice_dic = {}
         for indice in indices:
+        
             res+=f"{indice.upper()}:\n"
             if indice == "tokens": indice_dic = self.index
             elif indice == "stemming": indice_dic = self.sindex
@@ -440,10 +443,9 @@ class SAR_Indexer:
             if self.multifield:
                 
                 for field in self.fields:
-                    if field[1]:
-                        print(indice)
-                        res+=f"\t# of tokens in '{field[0]}': {len(indice_dic[field[0]].keys())}\n"
-            else: res+=f"\t\# of tokens in 'all': {len(indice_dic['all'])}\n"
+                    
+                    res+=f"\t# of tokens in '{field[0]}': {len(indice_dic[field[0]])}\n"
+            else: res+=f"\t# of tokens in 'all': {len(indice_dic['all'])}\n"
             res+=f"{sep2}\n"
         
        
@@ -452,6 +454,7 @@ class SAR_Indexer:
         else: res+= "Positional queries are NOT allowed\n"
         res+=f"{sep1}"
         print(res)
+       # print([token for token in self.ptindex['all'] if token[0].startswith("a$")])
 
 
 
