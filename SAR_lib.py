@@ -405,7 +405,7 @@ class SAR_Indexer:
             #     continue
                
             for token in self.index[field].keys():
-                self.ptindex[field].extend(sorted((f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1)))
+                self.ptindex[field].extend((f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1))
             self.ptindex[field] = sorted(list(set(self.ptindex[field])))
 
     def show_stats(self):
