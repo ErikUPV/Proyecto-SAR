@@ -605,14 +605,21 @@ class SAR_Indexer:
         w = [1 for i in docs]
         j = 1
         temporal = []
-        if op[0] == '(':
-            if op[0]=='not':
+        if op[0]=='not':
+            if op[1] == '(':
                 temporal.append('not')
+                res = [[], docs[0].copy()]
+                i = 2
+            else:
+                res = [self.reverse_posting(docs[0].copy())]
+                i = 1
+        elif op[0] == '(':
             res = [[], docs[0].copy()]
             i = 1
         else:
-            res = [self.reverse_posting(docs[0].copy()) if op[0]=='not' else docs[0].copy()]
+            res = [docs[0].copy()]
             i = 0
+        
         while i < len(op):
             if op[i] == 'and':
                 i += 1
