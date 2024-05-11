@@ -156,22 +156,54 @@ class SAR_Indexer:
     ###                         ###
     ###############################ç
     
-    def binary_search(self, lista, perm):
-            
-            #Para posicionales y permuterm porque son listas de tuplas
-            if type(lista[0]) == tuple: lista = [i[0] for i in lista]
-            
-            izq = 0
-            der = len(lista) - 1
-            while izq <= der:
-                mitad = izq + (der - izq) // 2
-                if lista[mitad] == perm:
-                    return mitad
-                elif lista[mitad] < perm:
-                    izq = mitad + 1
-                else:
-                    der = mitad - 1
-            return -1
+    def binary_search(self, lista: list, perm: any) -> int:
+        """
+        Hace una búsqueda binaria de un elemento en una lista y devuelve su posición.
+        
+        :param: lista: lista sobre la que buscar
+                perm: elemento a buscar
+        :result: posición del elemento, -1 si no está
+        """
+        if lista == None: return -1
+        if len(lista) == 0: return -1
+        
+        #Para posicionales y permuterm porque son listas de tuplas
+        if type(lista[0]) == tuple: lista = [i[0] for i in lista]
+        
+        izq = 0
+        der = len(lista) - 1
+        while izq <= der:
+            mitad = izq + (der - izq) // 2
+            if lista[mitad] == perm:
+                return mitad
+            elif lista[mitad] < perm:
+                izq = mitad + 1
+            else:
+                der = mitad - 1
+        return -1
+        
+    def insertOrdenado(self, lista: list, element: any) -> None:
+        """
+        Insetar de manera ordenada un elemento en una lista
+        
+        :param: lista: lista sobre la que inserar
+                perm: elemento a insertar
+        :result: None
+        """
+        izq = 0
+        der = len(lista) - 1
+        while izq <= der:
+            mitad = izq + (der - izq) // 2
+            if lista[mitad] == element:
+                # Si ya está el elemento
+                return
+            elif lista[mitad] < element:
+                izq = mitad + 1
+            else:
+                der = mitad - 1
+                
+        lista.insert(izq,element)
+                
 
     def already_in_index(self, article:Dict) -> bool:
         """
@@ -295,7 +327,7 @@ class SAR_Indexer:
                 for pos, token in enumerate(tokens):
                     # ======== Actualizar valores del indice ========
                     # Si no se ha visto el token aún se inicializa. Si se ha visto antes se actualizan sus valores
-                    if token not in visitedTokens: 
+                    if self.binary_search(visitedTokens,token) == -1: 
                         if token not in self.weight:
                             # Si el token no tiene contadores añadirlos
                             self.weight[token] = {
@@ -306,7 +338,7 @@ class SAR_Indexer:
                         '''En if'''
                         self.weight[token]['nArt'] += 1
                         self.weight[token]['terDocFrec'][artId] = 0
-                        visitedTokens.append(token)
+                        self.insertOrdenado(visitedTokens, token)
                     '''En if'''
                     
                     self.weight[token]['frec'] += 1
@@ -406,7 +438,7 @@ class SAR_Indexer:
                     self.sindex[field][stem] = []
                 
                 if token not in self.sindex[field][stem]:
-                    self.sindex[field][stem].append(token)
+                    self.insertOrdenado(self.sindex[field][stem],token)
          
     
     def make_permuterm(self):
