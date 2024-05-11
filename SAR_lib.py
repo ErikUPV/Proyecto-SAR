@@ -513,14 +513,14 @@ class SAR_Indexer:
                         i += 1
                         temporal.append('not')
                     else:
-                        res[-1] = self.reverse_posting(docs[j])
+                        res[-1] = self.reverse_posting(docs[j].copy())
                         j += 1
                         ini = False
                 elif i < len(op) and op[i] == '(':
                     res.append([])
                     i += 1
                 else: #Caso Normal
-                    res[-1] = docs[j]
+                    res[-1] = docs[j].copy()
                     j+=1
                     ini = False
             elif op[i] == 'and': # 2ºBloque: Realiza la operaacion AND
@@ -609,16 +609,15 @@ class SAR_Indexer:
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
         if len(self.tokenize(term)) > 1:
-            # Si hay más de una palabra en el termiod 
             return self.get_positionals(self.tokenize(term),field)
         elif '*' in term or '?' in term:
-            # Sin contineen alguno de los comodines para la búsqueda permuterm (* o ?)
             return self.get_permuterm(term,field)
         elif self.use_stemming:
-            # Si está activado el stemming
             return self.get_stemming(term,field)
         else: 
-            if self.positional:
+            # Comprobar como se ha contruido el índice, si con poscionales o normal.
+            _, aux = self.index[field].popitem()
+            if isinstance(aux, tuple):
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
                 if term not in self.index[field]:
