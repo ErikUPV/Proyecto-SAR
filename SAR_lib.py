@@ -366,7 +366,10 @@ class SAR_Indexer:
                             self.index[field][token].append((artId,[pos]))
                         else:
                             # Añadir posición de la ocurrencia al índice
-                            self.index[field][token][1].append(pos)
+                            posicionEnLista = self.binary_search(self.index[field][token], artId)
+                            self.index[field][token][posicionEnLista][1].append(pos)
+
+                                
                 '''END FOR TOKENS'''              
             '''END FOR FIELDS'''              
         '''END FOR LINES'''
