@@ -617,14 +617,14 @@ class SAR_Indexer:
                         i += 1
                         temporal.append('not')
                     else:
-                        res[-1] = self.reverse_posting(docs[j])
+                        res[-1] = self.reverse_posting(docs[j].copy())
                         j += 1
                         ini = False
                 elif i < len(op) and op[i] == '(':
                     res.append([])
                     i += 1
                 else:
-                    res[-1] = docs[j]
+                    res[-1] = docs[j].copy()
                     j+=1
                     ini = False
             elif op[i] == 'and':
