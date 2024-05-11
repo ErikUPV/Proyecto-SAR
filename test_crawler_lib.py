@@ -58,13 +58,42 @@ import random
             if res[i] == docId: break
             if res[i] >  docId: res.insert(i,docId); break
     print(f'{res = }')'''
+
+def insertOrdenado(lista: list, element: any) -> None:
+    """
+    Insetar de manera ordenada un elemento en una lista
+    
+    :param: lista: lista sobre la que inserar
+            perm: elemento a insertar
+    :result: None
+    """
+    izq = 0
+    der = len(lista) - 1
+    while izq <= der:
+        mitad = izq + (der - izq) // 2
+        if lista[mitad] == element:
+            # Si ya está el elemento
+            return
+        elif lista[mitad] < element:
+            izq = mitad + 1
+        else:
+            der = mitad - 1
+            
+    lista.insert(izq,element)
 if __name__ == "__main__":
-    diccionario: dict = {
-        1: (2,[2,23,45]),
-        2: (2,[2,23,45]),
-        5: 2
-    }
-    clave, aux = diccionario.popitem()
-    print(f'{clave = }, {aux = }')
-    print(isinstance(aux, tuple))
+    lista: list = [1,2,5,6,7,9,10]
+    insertOrdenado(lista, 3)
+    print(f'{lista = }')
+    insertOrdenado(lista, 3)
+    print(f'{lista = }')
+    insertOrdenado(lista, 8)
+    print(f'{lista = }')
+    insertOrdenado(lista, 11)
+    print(f'{lista = }')
+    insertOrdenado(lista, 30)
+    print(f'{lista = }')
+    insertOrdenado(lista, -3)
+    print(f'{lista = }')
+    
+    
     
