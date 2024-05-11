@@ -872,6 +872,11 @@ class SAR_Indexer:
         return: posting list
 
         """
+       
+            
+        ##################################################
+        ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
+        ##################################################
         def binary_search(lista, perm):
             izq = 0
             der = len(lista) - 1
@@ -884,10 +889,6 @@ class SAR_Indexer:
                 else:
                     der = mitad - 1
             return -1
-            
-        ##################################################
-        ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
-        ##################################################
         res = []
         pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
         permuterm = f'{term[pos+1:]}${term[:pos]}'
