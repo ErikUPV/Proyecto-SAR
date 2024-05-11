@@ -855,9 +855,9 @@ class SAR_Indexer:
         res = []
         pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
         permuterm = f'{term[pos+1:]}${term[:pos]}'
-        for value in self.ptindex[field].values():
-            if permuterm in value[0]:
-                res += self.index[field].value[1]
+        for perm, token in self.ptindex[field].values():
+            if permuterm in perm:
+                res += self.index[field][token]
         return res
 
 
