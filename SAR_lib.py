@@ -320,13 +320,13 @@ class SAR_Indexer:
                     # ======== Poscionales ========
                     if not self.positional:
                         # NORMAL 
-                        if artId not in self.index[field][token]:
+                        if self.binary_search(self.index[field][token],artId) == -1:
                             # Añadir el articulo en orden creciente
                             self.index[field][token].append(artId) 
                     else:
                         # POSICIONALES -> 
                         # cada termino tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...]                       
-                        if artId not in self.index[field][token]:
+                        if self.binary_search(self.index[field][token],artId) == -1:
                             # Añadir el articulo en orden creciente con su lista de posicionales
                             self.index[field][token].append((artId,[pos]))
                         else:
