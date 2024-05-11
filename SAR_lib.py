@@ -718,8 +718,7 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-        pos = len(self.tokenize(term)) > 1
-        if pos:
+        if len(self.tokenize(term)) > 1:
             # Si hay más de una palabra en el termiod 
             return self.get_positionals(self.tokenize(term),field)
         elif '*' in term or '?' in term:
@@ -729,7 +728,7 @@ class SAR_Indexer:
             # Si está activado el stemming
             return self.get_stemming(term,field)
         else: 
-            if pos:
+            if self.positional:
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
                 if term not in self.index[field]:
