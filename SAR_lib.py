@@ -1029,8 +1029,11 @@ class SAR_Indexer:
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
             for t in terminos:
-                resnippet = re.compile(f"\W+{t}\W+")
-                pos = resnippet.search(doc['all'], re.IGNORECASE)
+                #resnippet = re.compile(f"\W+{t}\W+")
+                resnippet = r'\b' + re.escape(t) + r'\b' # re.compile(f"\W+{t}\W+")
+                #pos = resnippet.search(doc['all'], re.IGNORECASE)
+                pos = re.search(resnippet, doc['all'].lower())
+                # patron = r'\b' + re.escape(palabra_buscada) + r'\b'
                 if pos:
                     pos = pos.span()
                 else:
