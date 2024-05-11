@@ -571,9 +571,8 @@ class SAR_Indexer:
                 docs.append(self.get_posting(i,'all'))
         if len(op) == 0:
             return docs[0]
-        w = [1 for i in docs]
-        j = 0
-        i = 0
+        # w = [1 for i in docs]
+        j ,i=0,0
         temporal = []
         res = [[]]
         ini = True
@@ -1071,7 +1070,7 @@ class SAR_Indexer:
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
             for t in terminos:
                 #resnippet = re.compile(f"\W+{t}\W+")
-                resnippet = r'\b' + re.escape(t) + r'\b' # re.compile(f"\W+{t}\W+")
+                resnippet = rf'\b{re.escape(t)}\b' # re.compile(f"\W+{t}\W+")
                 #pos = resnippet.search(doc['all'], re.IGNORECASE)
                 pos = re.search(resnippet, doc['all'].lower())
                 # patron = r'\b' + re.escape(palabra_buscada) + r'\b'
