@@ -432,7 +432,7 @@ class SAR_Indexer:
             words: list = []
             
             if self.positional:
-                words = [token[0] for token in self.index[field].keys()]
+                words = [token[0] for token in list(self.index[field].keys())]
             else:
                 words = self.index[field].keys()
                 
@@ -469,7 +469,7 @@ class SAR_Indexer:
             words: list = []
             
             if self.positional:
-                words = [token[0] for token in self.index[field].keys()]
+                words = [token[0] for token in list(self.index[field].keys())]
             else:
                 words = self.index[field].keys()
            
