@@ -506,110 +506,6 @@ class SAR_Indexer:
         return: posting list con el resultado de la query
 
         """
-        ########################################
-        ## COMPLETAR PARA TODAS LAS VERSIONES ##
-        ########################################
-        '''def depurar(l):
-            l = l.lower().split()
-            parentesis = False
-            multi = False
-            c = 0
-            s = 0
-            aux = []
-            res = []
-            for i in l:
-                if not multi:
-                    if i[0] == '(':
-                        c += 1
-                        aux.append(i)
-                        parentesis = True
-                    elif i[-1] == ')':
-                        c -= 1
-                        aux.append(i)
-                        res.append(' '.join(aux))
-                        aux = []
-                    elif c>0:
-                        aux.append(i)
-                if not parentesis:
-                    if i[0] == "'":
-                        s += 1
-                        aux.append(i)
-                        multi = True
-                    elif i[-1] == "'":
-                        s -= 1
-                        aux.append(i)
-                        res.append(' '.join(aux))
-                        aux = []
-                    elif s>0:
-                        aux.append(i)
-                if s == 0 and not (parentesis or multi):
-                    multi = False
-                    res.append(i)
-                elif c == 0 and not (parentesis or multi):
-                    parentesis = False
-                    res.append(i)
-            return res
-
-        if query is None or len(query) == 0:
-            return []
-        queryO = query
-        query = depurar(query)
-        if query[0] == 'not':
-            n = query[1]
-            q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
-                else n
-            q = self.reverse_posting(self.get_posting(q,'all'))
-            i = 2
-        else:
-            n = query[0]
-            q = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
-                else n
-            q = self.get_posting(q,'all')
-            i = 1
-        c = 0
-        while i < len(query):
-            if query[i] == 'and':
-                if query[i + 1] == 'not':
-                    n = query[i + 2]
-                    if n[0] == '(':
-                        aux = self.solve_query(n[i:len(n) - 1])
-                    else:
-                        aux = n
-                    q = self.minus_posting(q,self.get_posting(aux,'all'))
-                    i+=2
-                else:
-                    n = query[i + 1]
-                    aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
-                        else n
-                    q = self.and_posting(q,self.get_posting(aux,'all'))
-                    i+=1
-            elif query[i] == 'or':
-                if query[i + 1] == 'not':
-                    n = query[i + 2]
-                    aux = self.solve_query(n[i:len(n) - 1]) if n[0] == '(' \
-                        else n
-                    aux = self.reverse_posting(self.get_posting(aux,'all'))
-                    i += 2
-                else:
-                    n = query[i + 1]
-                    aux = self.solve_query(n[1:len(n) - 1]) if n[0] == '(' \
-                        else n
-                    aux = self.get_posting(aux,'all')
-                    i += 1
-                q = self.or_posting(q, aux)
-            else:
-                n = query[i]
-                q = self.solve_query(n[i:len(query[i]) - 1]) if n[0] == '(' \
-                    else n
-                q = self.get_posting(q,'all')
-            i += 1
-
-        def short(query,q):
-            query = re.findall(r'("[^"]+"|\w+)', query.lower())
-            query = [i for i in query if i not in ['and','or','not']]
-            idf = [math.log(len(self.articles) / len(self.get_posting(j))) for j in query]
-            for i in q:
-                itf = [1 + math.log(self.weight[j]['terDocFrec'][i]) for j in query]'''
         query = re.findall(r"'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
         op = []
         docs = []
@@ -618,6 +514,8 @@ class SAR_Indexer:
                 op.append(i)
             else:
                 docs.append(self.get_posting(i,'all'))
+        if len(op) == 0:
+            return docs[0]
         w = [1 for i in docs]
         j = 0
         i = 0
@@ -626,7 +524,7 @@ class SAR_Indexer:
         ini = True
         while i < len(op):
             if ini:
-                if op[i] == 'not':
+                if op[i] == 'not': # 1ºBloque: Inicio en query y sub-query
                     i += 1
                     if i < len(op) and op[i] == '(':
                         res.append([])
@@ -639,16 +537,15 @@ class SAR_Indexer:
                 elif i < len(op) and op[i] == '(':
                     res.append([])
                     i += 1
-                else:
+                else: #Caso Normal
                     res[-1] = docs[j].copy()
                     j+=1
                     ini = False
-            elif op[i] == 'and':
+            elif op[i] == 'and': # 2ºBloque: Realiza la operaacion AND
                 i += 1
                 if i < len(op) and op[i] == 'not':
                     i += 1
                     if i < len(op) and op[i] == '(':
-                        #res.append(docs[j])
                         res.append([])
                         i += 1
                         temporal.append('except')
@@ -664,12 +561,11 @@ class SAR_Indexer:
                 else:
                     res[-1] = self.and_posting(res[-1], docs[j])
                     j += 1
-            elif op[i] == 'or':
+            elif op[i] == 'or': # 3ºBloque: Realiza la operaacion OR
                 i += 1
                 if i < len(op) and op[i] == 'not':
                     i += 1
                     if i < len(op) and op[i] == '(':
-                        #res.append(docs[j])
                         res.append([])
                         i += 1
                         temporal.append('ornot')
@@ -685,7 +581,7 @@ class SAR_Indexer:
                 else:
                     res[-1] = self.or_posting(res[-1], docs[j])
                     j += 1
-            elif op[i] == ')':
+            elif op[i] == ')':# 4º Bloque: Resuelve los parentesis
                 t = temporal.pop() if len(temporal) > 0 else ''
                 aux = res.pop()
                 if t == 'and':
@@ -702,11 +598,6 @@ class SAR_Indexer:
                     res[-1] = aux
                 i += 1
         return res[0]
-
-
-        # Short
-        #q = short(queryO,q)
-        #return q
 
 
 
