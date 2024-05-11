@@ -603,44 +603,51 @@ class SAR_Indexer:
             else:
                 docs.append(self.get_posting(i,'all'))
         w = [1 for i in docs]
-        j = 1
+        j = 0
+        i = 0
         temporal = []
-        if op[0]=='not':
-            if op[1] == '(':
-                temporal.append('not')
-                res = [[], []]
-                j-=1
-                i = 2
-            else:
-                res = [self.reverse_posting(docs[0].copy())]
-                i = 1
-        elif op[0] == '(':
-            res = [[], docs[0].copy()]
-            i = 1
-        else:
-            res = [docs[0].copy()]
-            i = 0
-
+        res = [[]]
+        ini = True
         while i < len(op):
-            if op[i] == 'and':
+            if ini:
+                if op[i] == 'not':
+                    i += 1
+                    if i < len(op) and op[i] == '(':
+                        res.append([])
+                        i += 1
+                        temporal.append('not')
+                    else:
+                        res[-1] = self.reverse_posting(docs[j])
+                        j += 1
+                        ini = False
+                elif i < len(op) and op[i] == '(':
+                    res.append([])
+                    i += 1
+                else:
+                    res[-1] = docs[j]
+                    j+=1
+                    ini = False
+            elif op[i] == 'and':
                 i += 1
                 if i < len(op) and op[i] == 'not':
                     i += 1
                     if i < len(op) and op[i] == '(':
                         #res.append(docs[j])
                         res.append([])
-                        j-=1
                         i += 1
                         temporal.append('except')
+                        ini = True
                     else:
                         res[-1] = self.minus_posting(res[-1], docs[j])
+                        j += 1
                 elif i < len(op) and op[i] == '(':
-                    res.append(docs[j])
+                    res.append([])
                     i += 1
                     temporal.append('and')
+                    ini = True
                 else:
                     res[-1] = self.and_posting(res[-1], docs[j])
-                j += 1
+                    j += 1
             elif op[i] == 'or':
                 i += 1
                 if i < len(op) and op[i] == 'not':
@@ -648,27 +655,20 @@ class SAR_Indexer:
                     if i < len(op) and op[i] == '(':
                         #res.append(docs[j])
                         res.append([])
-                        j-=1
                         i += 1
                         temporal.append('ornot')
+                        ini = True
                     else:
                         res[-1] = self.or_posting(res[-1], self.reverse_posting(docs[j]))
+                        j += 1
                 elif i < len(op) and op[i] == '(':
-                    res.append(docs[j])
+                    res.append([])
                     i += 1
                     temporal.append('or')
+                    ini = True
                 else:
                     res[-1] = self.or_posting(res[-1], docs[j])
-                j += 1
-            elif op[i] == 'not':
-                i+=1
-                if i< len(op) and op[i]=='(':
-                    res.append([])
-                    i+=1
-                    temporal.append('not')
-                else:
-                    res[-1] = self.reverse_posting(docs[j])
-                    j+=1
+                    j += 1
             else:
                 if op[i] == ')':
                     t = temporal.pop() if len(temporal) > 0 else ''
@@ -718,7 +718,8 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-        if len(self.tokenize(term)) > 1:
+        pos = len(self.tokenize(term)) > 1
+        if pos:
             # Si hay más de una palabra en el termiod 
             return self.get_positionals(self.tokenize(term),field)
         elif '*' in term or '?' in term:
@@ -728,7 +729,7 @@ class SAR_Indexer:
             # Si está activado el stemming
             return self.get_stemming(term,field)
         else: 
-            if self.positional:
+            if pos:
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
                 if term not in self.index[field]:
