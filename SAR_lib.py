@@ -156,7 +156,7 @@ class SAR_Indexer:
     ###                         ###
     ###############################ç
     
-    def binary_search(lista, perm):
+    def binary_search(self, lista, perm):
             
             #Para posicionales y permuterm porque son listas de tuplas
             if type(lista[0]) == tuple: lista = [i[0] for i in lista]
