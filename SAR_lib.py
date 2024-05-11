@@ -563,24 +563,22 @@ class SAR_Indexer:
                 else:
                     res[-1] = self.or_posting(res[-1], docs[j])
                     j += 1
-            else:
-                # 4º Bloque: Resuelve los parentesis
-                if op[i] == ')':
-                    t = temporal.pop() if len(temporal) > 0 else ''
-                    aux = res.pop()
-                    if t == 'and':
-                        res[-1] = self.and_posting(res[-1], aux)
-                    elif t == 'or':
-                        res[-1] = self.or_posting(res[-1], aux)
-                    elif t == 'except':
-                        res[-1] = self.minus_posting(res[-1], aux)
-                    elif t == 'ornot':
-                        res[-1] = self.or_posting(res[-1], self.reverse_posting(aux))
-                    elif t == 'not':
-                        res[-1] = self.reverse_posting(aux)
-                    else:
-                        res[-1] = aux
-                    i += 1
+            elif op[i] == ')':# 4º Bloque: Resuelve los parentesis
+                t = temporal.pop() if len(temporal) > 0 else ''
+                aux = res.pop()
+                if t == 'and':
+                    res[-1] = self.and_posting(res[-1], aux)
+                elif t == 'or':
+                    res[-1] = self.or_posting(res[-1], aux)
+                elif t == 'except':
+                    res[-1] = self.minus_posting(res[-1], aux)
+                elif t == 'ornot':
+                    res[-1] = self.or_posting(res[-1], self.reverse_posting(aux))
+                elif t == 'not':
+                    res[-1] = self.reverse_posting(aux)
+                else:
+                    res[-1] = aux
+                i += 1
         return res[0]
 
 
