@@ -805,7 +805,7 @@ class SAR_Indexer:
         permuterm = f'{term[pos+1:]}${term[:pos]}'
         
         #Buscamos una posición de la lista self.ptindex[field] donde aparece el permuterm
-        permuterm_pos = binary_search(self.ptindex[field],permuterm)
+        permuterm_pos = self.binary_search(self.ptindex[field],permuterm)
         
         #Esta posición puede no ser la primera, de forma que navegamos hacia atrás hasta encontrar la primera
         encontrado_primero = False
