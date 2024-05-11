@@ -498,6 +498,8 @@ class SAR_Indexer:
                 op.append(i)
             else:
                 docs.append(self.get_posting(i,'all'))
+        if len(op) == 0:
+            return docs[0]
         w = [1 for i in docs]
         j = 0
         i = 0
