@@ -713,22 +713,7 @@ class SAR_Indexer:
         """
         ########################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE POSICIONALES ##
-        ########################################################
-        def getOcurrencias(artId: int, posting: list) -> Optional[list]: 
-            '''
-            devuelve las ocurrencias en una posting list de un token dentro un articulo,
-            si NO aparece el articulo en la posting list devuelve None
-            
-            param:  "artId": id del articulo a buscar en posting
-                    "posting": posting list sobre la que hacer la búsqueda                
-                
-            return: ocurrencias list or none
-            '''
-            for (id, ocurrencias) in posting:
-                if id == artId: return ocurrencias
-            return None
-            
-            
+        ########################################################      
         res = []
         postings = []
         for termino in terms:
@@ -752,7 +737,10 @@ class SAR_Indexer:
                 ValidoOcurrencia = True
                 for posRelativa, posting in enumerate(postings):
                     # Recuperar ocurrencias del siguiente token del artIds
-                    ocurrenciasAux = getOcurrencias(artId,posting)
+                    ocurrenciasAux = None
+                    for (id, ocurrenciasSearch) in posting:
+                        if id == artId: 
+                            ocurrenciasAux = ocurrenciasSearch
                     
                     # Ver si en las posición que tendría que tener el siguiene token en el artículo está
                     # Si el articulo NO aparece en la posting list del siguiente token fuera
