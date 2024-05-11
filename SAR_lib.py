@@ -168,7 +168,10 @@ class SAR_Indexer:
         if len(lista) == 0: return -1
         
         #Para posicionales y permuterm porque son listas de tuplas
-        if type(lista[0]) == tuple: auxLista = [i[0] for i in lista]
+        if type(lista[0]) == tuple: 
+            auxLista = [i[0] for i in lista]
+        else: 
+            auxLista = lista
         
         izq = 0
         der = len(auxLista) - 1
