@@ -603,21 +603,33 @@ class SAR_Indexer:
             else:
                 docs.append(self.get_posting(i,'all'))
         w = [1 for i in docs]
-        if op[0] == '(':
+        j = 1
+        temporal = []
+        if op[0]=='not':
+            if op[1] == '(':
+                temporal.append('not')
+                res = [[], []]
+                j-=1
+                i = 2
+            else:
+                res = [self.reverse_posting(docs[0].copy())]
+                i = 1
+        elif op[0] == '(':
             res = [[], docs[0].copy()]
             i = 1
         else:
             res = [docs[0].copy()]
             i = 0
-        j = 1
-        temporal = []
+
         while i < len(op):
             if op[i] == 'and':
                 i += 1
                 if i < len(op) and op[i] == 'not':
                     i += 1
                     if i < len(op) and op[i] == '(':
-                        res.append(docs[j])
+                        #res.append(docs[j])
+                        res.append([])
+                        j-=1
                         i += 1
                         temporal.append('except')
                     else:
@@ -634,7 +646,9 @@ class SAR_Indexer:
                 if i < len(op) and op[i] == 'not':
                     i += 1
                     if i < len(op) and op[i] == '(':
-                        res.append(docs[j])
+                        #res.append(docs[j])
+                        res.append([])
+                        j-=1
                         i += 1
                         temporal.append('ornot')
                     else:
@@ -646,6 +660,15 @@ class SAR_Indexer:
                 else:
                     res[-1] = self.or_posting(res[-1], docs[j])
                 j += 1
+            elif op[i] == 'not':
+                i+=1
+                if i< len(op) and op[i]=='(':
+                    res.append([])
+                    i+=1
+                    temporal.append('not')
+                else:
+                    res[-1] = self.reverse_posting(docs[j])
+                    j+=1
             else:
                 if op[i] == ')':
                     t = temporal.pop() if len(temporal) > 0 else ''
@@ -658,6 +681,8 @@ class SAR_Indexer:
                         res[-1] = self.minus_posting(res[-1], aux)
                     elif t == 'ornot':
                         res[-1] = self.or_posting(res[-1], self.reverse_posting(aux))
+                    elif t == 'not':
+                        res[-1] = self.reverse_posting(aux)
                     else:
                         res[-1] = aux
                     i += 1
@@ -693,8 +718,7 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-        pos = len(self.tokenize(term)) > 1
-        if pos:
+        if len(self.tokenize(term)) > 1:
             # Si hay más de una palabra en el termiod 
             return self.get_positionals(self.tokenize(term),field)
         elif '*' in term or '?' in term:
@@ -704,7 +728,7 @@ class SAR_Indexer:
             # Si está activado el stemming
             return self.get_stemming(term,field)
         else: 
-            if pos:
+            if self.positional:
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
                 if term not in self.index[field]:
@@ -875,11 +899,16 @@ class SAR_Indexer:
         """
 
         j = 0
-        allP = self.articles.keys()
+        allP = list(self.articles.keys())
         l = []
-        for i in allP:
+        for i,n in enumerate(allP):
+            if j >= len(p):
+                break
             if i != p[j]:
                 l.append(i)
+            else:
+                j+=1
+        l+=allP[n:]
         # l = [i for i in allP if i not in p]
 
         return l
@@ -1018,24 +1047,49 @@ class SAR_Indexer:
 
         return: el numero de artículo recuperadas, para la opcion -T
         """
-        q = self.solve_query(query)
+        def npalabras(nantes, ndespues, texto, pos):
+            cotainf = pos
+            cotasup = pos
+            while nantes > 0 and cotainf > 0:
+                if texto[cotainf] == '\n':
+                    cotainf = cotainf-1
+                    break
+                if texto[cotainf] == " ":
+                    nantes = nantes -1
+                cotainf = cotainf -1
+            while ndespues > 0 and cotasup < len(texto)-1:
+                if texto[cotasup] == '\n':
+                    break
+                if texto[cotasup] == " ":
+                    ndespues = ndespues -1
+                cotasup = cotasup +1
+            return (cotainf+1, cotasup)
         
+        terminos = []
+        for t in self.tokenize(query):
+            if t != 'and' and t != 'or':
+                terminos.append(t)
+
+        q = self.solve_query(query)
         for i in range(len(q) if self.show_all else min(10,len(q))):
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
+            for t in terminos:
+                resnippet = re.compile(f"\W+{t}\W+")
+                pos = resnippet.search(doc['all'], re.IGNORECASE)
+                if pos:
+                    pos = pos.span()
+                else:
+                    pos = -1
+                if pos != -1:
+                    (cotainf, cotasup) = npalabras(6,7,doc['all'],pos[0])
+                    #print(doc['all'][pos[0]-5:pos[0]+15])
+                    print(f"...{doc['all'][cotainf+1:cotasup-1]}...\n")
+
 
         print(f"Number of results: {len(q)}")
         return len(q)
         ################
         ## COMPLETAR  ##
         ################
-
-
-
-
-
-
-
-        
-
