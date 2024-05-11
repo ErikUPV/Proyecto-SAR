@@ -55,7 +55,7 @@ class SAR_Indexer:
         'terDocFrec': Has para cada articulo, cuantas veces se ha visto ese token en cada articulo
         '''         
         self.articles = {} # hash de articulos --> clave entero (artid), valor: la info necesaria para diferencia los artículos dentro de su fichero
-        self.tokenizer = re.compile("\W+") # expresion regular para hacer la tokenizacion
+        self.tokenizer = re.compile(r'\W+') # expresion regular para hacer la tokenizacion
         self.stemmer = SnowballStemmer('spanish') # stemmer en castellano
         self.show_all = False # valor por defecto, se cambia con self.set_showall()
         self.show_snippet = False # valor por defecto, se cambia con self.set_snippet()
