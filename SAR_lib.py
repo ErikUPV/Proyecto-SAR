@@ -732,7 +732,7 @@ class SAR_Indexer:
         res = []
         postings = []
         for termino in terms:
-            if terms not in self.index[field]:
+            if termino not in self.index[field]:
                 # si algún termino NO ha sido indexado no se busca
                 return res
             else:
