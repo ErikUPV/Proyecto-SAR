@@ -164,6 +164,9 @@ class SAR_Indexer:
                 perm: elemento a buscar
         :result: posición del elemento, -1 si no está
         """
+        if lista == None: return -1
+        if len(lista) == 0: return -1
+        
         #Para posicionales y permuterm porque son listas de tuplas
         if type(lista[0]) == tuple: lista = [i[0] for i in lista]
         
