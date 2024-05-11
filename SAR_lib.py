@@ -368,6 +368,7 @@ class SAR_Indexer:
                         else:
                             # Añadir posición de la ocurrencia al índice
                             self.index[field][token][posicionEnLista][1].append(pos)
+                            
 
                                 
                 '''END FOR TOKENS'''              
@@ -429,12 +430,9 @@ class SAR_Indexer:
         for (field,ifIndex) in self.fields:
             if not ifIndex: continue
             
-            words: list = []
             
-            if self.positional:
-                words = [token[0] for token in list(self.index[field].keys())]
-            else:
-                words = self.index[field].keys()
+            
+            words = self.index[field].keys()
                 
                 
             for token in words:
@@ -466,12 +464,8 @@ class SAR_Indexer:
             #     self.ptindex[field].extend([token for token in self.index[field].keys()])
             #     self.ptindex[field] = list(set(self.ptindex[field]))
             #     continue
-            words: list = []
             
-            if self.positional:
-                words = [token[0] for token in list(self.index[field].keys())]
-            else:
-                words = self.index[field].keys()
+            words = self.index[field].keys()
            
             
                
