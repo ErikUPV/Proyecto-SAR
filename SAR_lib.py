@@ -1051,10 +1051,13 @@ class SAR_Indexer:
             return (cotainf+1, cotasup)
         
         terminos = []
-        for t in self.tokenize(query):
-            if t != 'and' and t != 'or':
+        query_normalizada = re.findall(r"'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
+        for t in query_normalizada:
+            if t not in {'and', 'not', 'or', '(', ')'}:
+                if t[0] == '\'':
+                    t = t[1:-1]
                 terminos.append(t)
-
+        print(terminos)
         q = self.solve_query(query)
         for i in range(len(q) if self.show_all else min(10,len(q))):
             doc = open(self.docs[self.articles[q[i]][0]], "r")
