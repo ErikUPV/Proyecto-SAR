@@ -873,17 +873,59 @@ class SAR_Indexer:
         return: posting list
 
         """
-
+       
+            
         ##################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
         ##################################################
+        def binary_search(lista, perm):
+            izq = 0
+            der = len(lista) - 1
+            while izq <= der:
+                mitad = izq + (der - izq) // 2
+                if lista[mitad][0] == perm:
+                    return mitad
+                elif lista[mitad][0] < perm:
+                    izq = mitad + 1
+                else:
+                    der = mitad - 1
+            return -1
         res = []
         pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
         permuterm = f'{term[pos+1:]}${term[:pos]}'
-        for perm, token in self.ptindex[field].values():
-            if permuterm in perm:
-                res += self.index[field][token]
-        return res
+        
+        #Buscamos una posición de la lista self.ptindex[field] donde aparece el permuterm
+        permuterm_pos = binary_search(self.ptindex[field],permuterm)
+        
+        #Esta posición puede no ser la primera, de forma que navegamos hacia atrás hasta encontrar la primera
+        encontrado_primero = False
+        while not encontrado_primero:
+            if permuterm_pos == -1:
+                pass
+            elif permuterm_pos == 0:
+                encontrado_primero = True
+            elif self.ptindex[field][permuterm_pos - 1][0] == permuterm:
+                permuterm_pos -= 1
+            elif self.ptindex[field][permuterm_pos -1][0] != permuterm_pos:
+                encontrado_primero = True
+        
+        #Si hemos encontrado la primera posición, buscamos todos los tokens cuyo permuterm es el mismo
+        #y concatenamos sus postings list.    
+        if encontrado_primero:
+             while permuterm_pos < len(self.ptindex[field]) and self.ptindex[field][permuterm_pos][0] == permuterm:
+                token = self.ptindex[field][permuterm_pos][1]
+                if self.index[field][token] not in res:
+                    res += self.index[field][token]
+                permuterm_pos += 1
+        
+        #Devolvemos la postings list ordenada
+        return sorted(res)
+        
+        # for perm, token in self.ptindex[field].values():
+        #     if permuterm in perm:
+        #         res += self.index[field][token]
+        # return res
+        
 
 
 
