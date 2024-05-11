@@ -74,7 +74,7 @@ class SAR_Indexer:
     ###      CONFIGURACION      ###
     ###                         ###
     ###############################
-
+    
 
     def set_showall(self, v:bool):
         """
@@ -154,7 +154,24 @@ class SAR_Indexer:
     ###                         ###
     ###   PARTE 1: INDEXACION   ###
     ###                         ###
-    ###############################
+    ###############################ç
+    
+    def binary_search(lista, perm):
+            
+            #Para posicionales y permuterm porque son listas de tuplas
+            if type(lista[0]) == tuple: lista = [i[0] for i in lista]
+            
+            izq = 0
+            der = len(lista) - 1
+            while izq <= der:
+                mitad = izq + (der - izq) // 2
+                if lista[mitad] == perm:
+                    return mitad
+                elif lista[mitad] < perm:
+                    izq = mitad + 1
+                else:
+                    der = mitad - 1
+            return -1
 
     def already_in_index(self, article:Dict) -> bool:
         """
@@ -782,18 +799,7 @@ class SAR_Indexer:
         ##################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
         ##################################################
-        def binary_search(lista, perm):
-            izq = 0
-            der = len(lista) - 1
-            while izq <= der:
-                mitad = izq + (der - izq) // 2
-                if lista[mitad][0] == perm:
-                    return mitad
-                elif lista[mitad][0] < perm:
-                    izq = mitad + 1
-                else:
-                    der = mitad - 1
-            return -1
+        
         res = []
         pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
         permuterm = f'{term[pos+1:]}${term[:pos]}'
