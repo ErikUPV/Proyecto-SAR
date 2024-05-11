@@ -568,7 +568,7 @@ class SAR_Indexer:
             if i in {'and', 'not', 'or', '(', ')'}:
                 op.append(i)
             else:
-                docs.append(self.get_posting(i,'all'))
+                docs.append(self.get_posting(i if i[0]!="'" else i[1:len(i)-1],'all'))
         if len(op) == 0:
             return docs[0]
         # w = [1 for i in docs]
@@ -1076,7 +1076,7 @@ class SAR_Indexer:
                 else:
                     pos = -1
                 if pos != -1:
-                    (cotainf, cotasup) = npalabras(6,7,doc['all'],pos[0])
+                    (cotainf, cotasup) = npalabras(6,len(terminos)+5,doc['all'],pos[0])
                     #print(doc['all'][pos[0]-5:pos[0]+15])
                     print(f"...{doc['all'][cotainf+1:cotasup-1]}...\n")
 
