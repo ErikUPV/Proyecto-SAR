@@ -55,7 +55,7 @@ class SAR_Indexer:
         'terDocFrec': Has para cada articulo, cuantas veces se ha visto ese token en cada articulo
         '''         
         self.articles = {} # hash de articulos --> clave entero (artid), valor: la info necesaria para diferencia los artículos dentro de su fichero
-        self.tokenizer = re.compile("\W+") # expresion regular para hacer la tokenizacion
+        self.tokenizer = re.compile(r'\W+') # expresion regular para hacer la tokenizacion
         self.stemmer = SnowballStemmer('spanish') # stemmer en castellano
         self.show_all = False # valor por defecto, se cambia con self.set_showall()
         self.show_snippet = False # valor por defecto, se cambia con self.set_snippet()
@@ -562,7 +562,7 @@ class SAR_Indexer:
             if i in {'and', 'not', 'or', '(', ')'}:
                 op.append(i)
             else:
-                docs.append(self.get_posting(i,'all'))
+                docs.append(self.get_posting(i if i[0]!="'" else i[1:len(i)-1],'all'))
         if len(op) == 0:
             return docs[0]
         # w = [1 for i in docs]
@@ -681,7 +681,7 @@ class SAR_Indexer:
         else: 
             # Comprobar como se ha contruido el índice, si con poscionales o normal.
             _, aux = self.index[field].popitem()
-            if isinstance(aux, tuple):
+            if isinstance(aux[0], tuple):
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
                 if term not in self.index[field]:
@@ -726,7 +726,7 @@ class SAR_Indexer:
         res = []
         postings = []
         for termino in terms:
-            if terms not in self.index[field][termino]:
+            if termino not in self.index[field]:
                 # si algún termino NO ha sido indexado no se busca
                 return res
             else:
@@ -1073,7 +1073,7 @@ class SAR_Indexer:
                 else:
                     pos = -1
                 if pos != -1:
-                    (cotainf, cotasup) = npalabras(6,7,doc['all'],pos[0])
+                    (cotainf, cotasup) = npalabras(6,len(terminos)+5,doc['all'],pos[0])
                     #print(doc['all'][pos[0]-5:pos[0]+15])
                     print(f"...{doc['all'][cotainf+1:cotasup-1]}...\n")
 
