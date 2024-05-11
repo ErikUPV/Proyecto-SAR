@@ -1079,7 +1079,7 @@ class SAR_Indexer:
                 else:
                     pos = -1
                 if pos != -1:
-                    (cotainf, cotasup) = npalabras(6,7,doc['all'],pos[0])
+                    (cotainf, cotasup) = npalabras(6,len(terminos)+5,doc['all'],pos[0])
                     #print(doc['all'][pos[0]-5:pos[0]+15])
                     print(f"...{doc['all'][cotainf+1:cotasup-1]}...\n")
 
