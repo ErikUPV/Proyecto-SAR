@@ -687,7 +687,7 @@ class SAR_Indexer:
         else: 
             # Comprobar como se ha contruido el índice, si con poscionales o normal.
             _, aux = self.index[field].popitem()
-            if isinstance(aux, tuple):
+            if isinstance(aux[0], tuple):
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
                 if term not in self.index[field]:
