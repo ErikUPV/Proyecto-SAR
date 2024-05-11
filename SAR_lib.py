@@ -361,12 +361,12 @@ class SAR_Indexer:
                     else:
                         # POSICIONALES -> 
                         # cada termino tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...]                       
-                        if self.binary_search(self.index[field][token],artId) == -1:
+                        posicionEnLista = self.binary_search(self.index[field][token],artId)
+                        if  posicionEnLista == -1:
                             # Añadir el articulo en orden creciente con su lista de posicionales
                             self.index[field][token].append((artId,[pos]))
                         else:
                             # Añadir posición de la ocurrencia al índice
-                            posicionEnLista = self.binary_search(self.index[field][token], artId)
                             self.index[field][token][posicionEnLista][1].append(pos)
 
                                 
