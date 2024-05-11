@@ -840,25 +840,25 @@ class SAR_Indexer:
         permuterm_pos = self.binary_search(self.ptindex[field],permuterm)
         
         #Esta posición puede no ser la primera, de forma que navegamos hacia atrás hasta encontrar la primera
-        encontrado_primero = False
-        while not encontrado_primero:
-            if permuterm_pos == -1:
-                pass
-            elif permuterm_pos == 0:
-                encontrado_primero = True
-            elif self.ptindex[field][permuterm_pos - 1][0] == permuterm:
-                permuterm_pos -= 1
-            elif self.ptindex[field][permuterm_pos -1][0] != permuterm_pos:
-                encontrado_primero = True
+        if permuterm_pos == -1: return []
+        # while not encontrado_primero:
+        #     if permuterm_pos == -1:
+        #         pass
+        #     elif permuterm_pos == 0:
+        #         encontrado_primero = True
+        #     elif self.ptindex[field][permuterm_pos - 1][0] == permuterm:
+        #         permuterm_pos -= 1
+        #     elif self.ptindex[field][permuterm_pos -1][0] != permuterm_pos:
+        #         encontrado_primero = True
         
         #Si hemos encontrado la primera posición, buscamos todos los tokens cuyo permuterm es el mismo
         #y concatenamos sus postings list.    
-        if encontrado_primero:
-             while permuterm_pos < len(self.ptindex[field]) and self.ptindex[field][permuterm_pos][0] == permuterm:
-                token = self.ptindex[field][permuterm_pos][1]
-                if self.index[field][token] not in res:
-                    res += self.index[field][token]
-                permuterm_pos += 1
+       
+        while permuterm_pos < len(self.ptindex[field]) and self.ptindex[field][permuterm_pos][0].startswith(permuterm):
+            token = self.ptindex[field][permuterm_pos][1]
+            if self.index[field][token] not in res:
+                res += self.index[field][token]
+            permuterm_pos += 1
         
         #Devolvemos la postings list ordenada
         return sorted(res)
@@ -1051,10 +1051,13 @@ class SAR_Indexer:
             return (cotainf+1, cotasup)
         
         terminos = []
-        for t in self.tokenize(query):
-            if t != 'and' and t != 'or':
+        query_normalizada = re.findall(r"'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
+        for t in query_normalizada:
+            if t not in {'and', 'not', 'or', '(', ')'}:
+                if t[0] == '\'':
+                    t = t[1:-1]
                 terminos.append(t)
-
+        print(terminos)
         q = self.solve_query(query)
         for i in range(len(q) if self.show_all else min(10,len(q))):
             doc = open(self.docs[self.articles[q[i]][0]], "r")
