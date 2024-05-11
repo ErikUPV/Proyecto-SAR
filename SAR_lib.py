@@ -608,7 +608,8 @@ class SAR_Indexer:
         if op[0]=='not':
             if op[1] == '(':
                 temporal.append('not')
-                res = [[], docs[0].copy()]
+                res = [[], []]
+                j-=1
                 i = 2
             else:
                 res = [self.reverse_posting(docs[0].copy())]
@@ -619,14 +620,16 @@ class SAR_Indexer:
         else:
             res = [docs[0].copy()]
             i = 0
-        
+
         while i < len(op):
             if op[i] == 'and':
                 i += 1
                 if i < len(op) and op[i] == 'not':
                     i += 1
                     if i < len(op) and op[i] == '(':
-                        res.append(docs[j])
+                        #res.append(docs[j])
+                        res.append([])
+                        j-=1
                         i += 1
                         temporal.append('except')
                     else:
@@ -643,7 +646,9 @@ class SAR_Indexer:
                 if i < len(op) and op[i] == 'not':
                     i += 1
                     if i < len(op) and op[i] == '(':
-                        res.append(docs[j])
+                        #res.append(docs[j])
+                        res.append([])
+                        j-=1
                         i += 1
                         temporal.append('ornot')
                     else:
@@ -655,6 +660,15 @@ class SAR_Indexer:
                 else:
                     res[-1] = self.or_posting(res[-1], docs[j])
                 j += 1
+            elif op[i] == 'not':
+                i+=1
+                if i< len(op) and op[i]=='(':
+                    res.append([])
+                    i+=1
+                    temporal.append('not')
+                else:
+                    res[-1] = self.reverse_posting(docs[j])
+                    j+=1
             else:
                 if op[i] == ')':
                     t = temporal.pop() if len(temporal) > 0 else ''
@@ -886,11 +900,16 @@ class SAR_Indexer:
         """
 
         j = 0
-        allP = self.articles.keys()
+        allP = list(self.articles.keys())
         l = []
-        for i in allP:
+        for i,n in enumerate(allP):
+            if j >= len(p):
+                break
             if i != p[j]:
                 l.append(i)
+            else:
+                j+=1
+        l+=allP[n:]
         # l = [i for i in allP if i not in p]
 
         return l
