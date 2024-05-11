@@ -568,7 +568,7 @@ class SAR_Indexer:
             if i in {'and', 'not', 'or', '(', ')'}:
                 op.append(i)
             else:
-                docs.append(self.get_posting(i,'all'))
+                docs.append(self.get_posting(i if i[0]!="'" else i[1:len(i)-1],'all'))
         if len(op) == 0:
             return docs[0]
         # w = [1 for i in docs]
