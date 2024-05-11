@@ -60,9 +60,11 @@ import random
     print(f'{res = }')'''
 if __name__ == "__main__":
     diccionario: dict = {
-        1: 1,
-        2: 4,
-        5: 10
+        1: (2,[2,23,45]),
+        2: (2,[2,23,45]),
+        5: 2
     }
-    print(diccionario[24])
+    clave, aux = diccionario.popitem()
+    print(f'{clave = }, {aux = }')
+    print(isinstance(aux, tuple))
     
