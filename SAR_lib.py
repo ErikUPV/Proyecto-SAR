@@ -374,7 +374,15 @@ class SAR_Indexer:
         for (field,ifIndex) in self.fields:
             if not ifIndex: continue
             
-            for token in self.index[field].keys():
+            words: list = []
+            
+            if self.positional:
+                words = [token[0] for token in self.index[field].keys()]
+            else:
+                words = self.index[field].keys()
+                
+                
+            for token in words:
                 stem: str = self.stemmer.stem(token)
                 
                 if stem not in self.sindex[field]:
@@ -403,8 +411,16 @@ class SAR_Indexer:
             #     self.ptindex[field].extend([token for token in self.index[field].keys()])
             #     self.ptindex[field] = list(set(self.ptindex[field]))
             #     continue
+            words: list = []
+            
+            if self.positional:
+                words = [token[0] for token in self.index[field].keys()]
+            else:
+                words = self.index[field].keys()
+           
+            
                
-            for token in self.index[field].keys():
+            for token in words:
                 self.ptindex[field].extend((f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1))
             self.ptindex[field] = sorted(list(set(self.ptindex[field])))
 
