@@ -463,8 +463,9 @@ class SAR_Indexer:
             
                
             for token in words:
-                self.ptindex[field].extend((f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1))
-            self.ptindex[field] = sorted(list(set(self.ptindex[field])))
+                permuterm = [(f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1)]
+                for item in permuterm:
+                    self.insertOrdenado(self.ptindex[field],item)
 
     def show_stats(self):
         """
@@ -558,7 +559,6 @@ class SAR_Indexer:
                 docs.append(self.get_posting(i if i[0]!="'" else i[1:len(i)-1],'all'))
         if len(op) == 0:
             return docs[0]
-        # w = [1 for i in docs]
         j ,i=0,0
         temporal = []
         res = [[]]
