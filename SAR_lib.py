@@ -549,14 +549,18 @@ class SAR_Indexer:
         return: posting list con el resultado de la query
 
         """
-        query = re.findall(r"'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
+        query = re.findall(r"\w+\:\w+|\w+\:'[^']*'|\w+\:\"[^\"]*\"|'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
         op = []
         docs = []
         for i in query:
             if i in {'and', 'not', 'or', '(', ')'}:
                 op.append(i)
             else:
-                docs.append(self.get_posting(i if i[0]!="'" else i[1:len(i)-1],'all'))
+                n = 'all'
+                if i.find(":")>0:
+                    n = i[:i.find(":")]
+                    i = i[i.find(":")+1:]
+                docs.append(self.get_posting(i if i[0]!="'" or i[0]!='"' else i[1:len(i)-1],n))
         if len(op) == 0:
             return docs[0]
         j ,i=0,0
