@@ -707,22 +707,7 @@ class SAR_Indexer:
         """
         ########################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE POSICIONALES ##
-        ########################################################
-        def getOcurrencias(artId: int, posting: list) -> Optional[list]: 
-            '''
-            devuelve las ocurrencias en una posting list de un token dentro un articulo,
-            si NO aparece el articulo en la posting list devuelve None
-            
-            param:  "artId": id del articulo a buscar en posting
-                    "posting": posting list sobre la que hacer la búsqueda                
-                
-            return: ocurrencias list or none
-            '''
-            for (id, ocurrencias) in posting:
-                if id == artId: return ocurrencias
-            return None
-            
-            
+        ########################################################      
         res = []
         postings = []
         for termino in terms:
@@ -738,30 +723,30 @@ class SAR_Indexer:
         # 
         # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
         for (artId,ocurrenciasArtId) in postings.pop(0): # Primera posting list
-            ValidoArtId: bool = True
-            
+            ValidoArtId: bool = False
+            ValidoOcurrencia: bool = True
             # mirar las ocurrencias en las listas asociadas a los siguientes términos
-            for posRelativa, posting in enumerate(postings):
-                econtradoPos: bool = False
-                
-                # Recuperar ocurrencias del siguiente token del artIds
-                ocurrenciasAux = getOcurrencias(artId,posting)
-                
-                # Si el articulo NO aparece en la posting list del siguiente token fuera
-                if ocurrenciasAux is None: 
-                    ValidoArtId = False
-                    break
-                
-                # Ver si en las posición que tendría que tener el siguiene token en el artículo está
-                for pos in ocurrenciasArtId:
-                    if (pos + posRelativa + 1) in ocurrenciasAux:
-                        econtradoPos = True
+            # El rojo y
+            for pos in ocurrenciasArtId:
+                ValidoOcurrencia = True
+                for posRelativa, posting in enumerate(postings):
+                    # Recuperar ocurrencias del siguiente token del artIds
+                    ocurrenciasAux = None
+                    for (id, ocurrenciasSearch) in posting:
+                        if id == artId: 
+                            ocurrenciasAux = ocurrenciasSearch
+                    
+                    # Ver si en las posición que tendría que tener el siguiene token en el artículo está
+                    # Si el articulo NO aparece en la posting list del siguiente token fuera
+                    if ocurrenciasAux is None or (pos + posRelativa + 1) not in ocurrenciasAux: 
+                        ValidoOcurrencia = False
                         break
-                '''End for mirar posiciones de cada artId'''
-                
-                ValidoArtId = econtradoPos
-                if not ValidoArtId: break             
-            '''End for mirar otras postings'''
+                '''End for mirar otras postings'''
+        
+                if ValidoOcurrencia:
+                    ValidoArtId = True
+                    break                             
+            '''End for mirar posiciones de cada artId'''
             
             if ValidoArtId: 
                 res.append(artId)
