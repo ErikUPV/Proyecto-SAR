@@ -423,18 +423,11 @@ class SAR_Indexer:
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
-        
+            
         # recuperar los tokens y sacarles sus steams.
-        
-            
-        for (field,ifIndex) in self.fields:
-            if not ifIndex: continue
-            
-            
-            
+        for (field,_) in self.fields:
             words = self.index[field].keys()
-                
-                
+                        
             for token in words:
                 stem: str = self.stemmer.stem(token)
                 
