@@ -470,8 +470,9 @@ class SAR_Indexer:
             
                
             for token in words:
-                self.ptindex[field].extend((f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1))
-            self.ptindex[field] = sorted(list(set(self.ptindex[field])))
+                permuterm = [(f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1)]
+                for item in permuterm:
+                    self.insertOrdenado(self.ptindex[field],item)
 
     def show_stats(self):
         """
