@@ -549,7 +549,8 @@ class SAR_Indexer:
         return: posting list con el resultado de la query
 
         """
-        query = re.findall(r"\w+\:\w+|\w+\:'[^']*'|\w+\:\"[^\"]*\"|'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
+        # a
+        query = re.findall(r"\w+(?:-\w+)*\:\w+[\*|\?|\w]+|\w+(?:-\w+)*\:'[^']*'|\w+(?:-\w+)*\:\"[^\"]*\"|'[^']*'|\"[^\"]*\"|\w+[\*|\?|\w]+|\(|\)", query.lower())
         op = []
         docs = []
         for i in query:
