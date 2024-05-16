@@ -569,7 +569,7 @@ class SAR_Indexer:
                 if i.find(":")>0:
                     n = i[:i.find(":")]
                     i = i[i.find(":")+1:]
-                docs.append(self.get_posting(i if i[0]!="'" or i[0]!='"' else i[1:len(i)-1],n))
+                docs.append(self.get_posting(i[1:len(i)-1] if i[0]=="'" or i[0]=='"' else i,n))
         if len(op) == 0:
             return docs[0]
         j ,i=0,0
