@@ -47,13 +47,13 @@ class SAR_Indexer:
         self.sindex = {} # hash para el indice invertido de stems --> clave: stem, valor: lista con los terminos que tienen ese stem
         self.ptindex = {} # hash para el indice permuterm.
         self.docs = {} # diccionario de terminos --> clave: entero(docid),  valor: ruta del fichero.
-        self.weight = {} # hash de terminos para el pesado, ranking de resultados. 
+        self.weight = {} # hash de terminos para el pesado, ranking de resultados.
         ''' 
         Para cada termino
         'frec': Cuantas veces se ha visto el término en la indexacióm
         'nArt': Numero de art en los que aparece
         'terDocFrec': Has para cada articulo, cuantas veces se ha visto ese token en cada articulo
-        '''         
+        '''
         self.articles = {} # hash de articulos --> clave entero (artid), valor: la info necesaria para diferencia los artículos dentro de su fichero
         self.tokenizer = re.compile(r'\W+') # expresion regular para hacer la tokenizacion
         self.stemmer = SnowballStemmer('spanish') # stemmer en castellano
@@ -67,14 +67,14 @@ class SAR_Indexer:
             self.index[field] = {}
             self.sindex[field] = {}
             self.ptindex[field] = []
-            
-        
+
+
     ###############################
     ###                         ###
     ###      CONFIGURACION      ###
     ###                         ###
     ###############################
-    
+
 
     def set_showall(self, v:bool):
         """
@@ -155,7 +155,7 @@ class SAR_Indexer:
     ###   PARTE 1: INDEXACION   ###
     ###                         ###
     ###############################ç
-    
+
     def binary_search(self, lista: list, perm: any) -> int:
         """
         Hace una búsqueda binaria de un elemento en una lista y devuelve su posición.
@@ -166,13 +166,13 @@ class SAR_Indexer:
         """
         if lista == None: return -1
         if len(lista) == 0: return -1
-        
+
         #Para posicionales y permuterm porque son listas de tuplas
-        if type(lista[0]) == tuple: 
+        if type(lista[0]) == tuple:
             auxLista = [i[0] for i in lista]
-        else: 
+        else:
             auxLista = lista
-        
+
         izq = 0
         der = len(auxLista) - 1
         while izq <= der:
@@ -184,7 +184,7 @@ class SAR_Indexer:
             else:
                 der = mitad - 1
         return -1
-        
+
     def insertOrdenado(self, lista: list, element: any) -> None:
         """
         Insetar de manera ordenada un elemento en una lista
@@ -204,9 +204,9 @@ class SAR_Indexer:
                 izq = mitad + 1
             else:
                 der = mitad - 1
-                
+
         lista.insert(izq,element)
-                
+
 
     def already_in_index(self, article:Dict) -> bool:
         """
@@ -236,7 +236,7 @@ class SAR_Indexer:
         self.permuterm = args['permuterm']
 
         file_or_dir = Path(root)
-        
+
         if file_or_dir.is_file():
             # is a file
             self.index_file(root)
@@ -254,8 +254,8 @@ class SAR_Indexer:
         ##########################################
         ## COMPLETAR PARA FUNCIONALIDADES EXTRA ##
         ##########################################
-        
-        
+
+
     def parse_article(self, raw_line:str) -> Dict[str, str]:
         """
         Crea un diccionario a partir de una linea que representa un artículo del crawler
@@ -266,7 +266,7 @@ class SAR_Indexer:
         Returns:
             Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
         """
-        
+
         article = json.loads(raw_line)
         sec_names = []
         txt_secs = ''
@@ -275,13 +275,13 @@ class SAR_Indexer:
             txt_secs += '\n'.join(subsec['name'] + '\n' + subsec['text'] + '\n' for subsec in sec['subsections']) + '\n\n'
             sec_names.append(sec['name'])
             sec_names.extend(subsec['name'] for subsec in sec['subsections'])
-        article.pop('sections') # no la necesitamos 
+        article.pop('sections') # no la necesitamos
         article['all'] = article['title'] + '\n\n' + article['summary'] + '\n\n' + txt_secs
         article['section-name'] = '\n'.join(sec_names)
 
         return article
-                
-    
+
+
     def index_file(self, filename:str):
         """
         Indexa el contenido de un fichero.
@@ -297,67 +297,67 @@ class SAR_Indexer:
         #################
         ### COMPLETAR ###
         #################
-            
+
         # ======== Actializar valores del indice ========
-        docId: int = len(self.docs) 
+        docId: int = len(self.docs)
         self.docs[docId] = os.path.abspath(filename)
-        
+
         for lineInFile, line in enumerate(open(filename)):
             # Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
             text = self.parse_article(line)
-            
+
             # Tokens ya vistos en el artículo, para el pesado self.weight
-            visitedTokens: list = [] 
-            
+            visitedTokens: list = []
+
             # Si ya se ha indexado este articulo
             if text['url'] in self.urls: continue
-            
+
             # ======== Actializar valores del indice ========
             artId: int = len(self.articles)
             self.articles[artId] = (docId,lineInFile)
-            
+
             # Añadir url del artículo a sus diccionario 
             self.urls.add(text["url"])
             self.index['url'][text["url"]] = artId
-            
+
             # ======== Actualizar los indices ========
             for (field,ifIndex) in self.fields:
                 if not self.multifield and field != 'all': continue
                 if not ifIndex: continue
-                
+
                 tokens: list = self.tokenize(text[field])
-                                                            
+
                 for pos, token in enumerate(tokens):
                     # ======== Actualizar valores del indice ========
                     # Si no se ha visto el token aún se inicializa. Si se ha visto antes se actualizan sus valores
-                    if self.binary_search(visitedTokens,token) == -1: 
+                    if self.binary_search(visitedTokens,token) == -1:
                         if token not in self.weight:
                             # Si el token no tiene contadores añadirlos
                             self.weight[token] = {
                                 'frec': 0,
-                                'nArt': 0,  
-                                'terDocFrec': {}                      
-                            }          
+                                'nArt': 0,
+                                'terDocFrec': {}
+                            }
                         '''En if'''
                         self.weight[token]['nArt'] += 1
                         self.weight[token]['terDocFrec'][artId] = 0
                         self.insertOrdenado(visitedTokens, token)
                     '''En if'''
-                    
+
                     self.weight[token]['frec'] += 1
                     self.weight[token]['terDocFrec'][artId] += 1
-                        
+
                     # ======== Indices ========
                     if token not in self.index[field]:
                         # Si el token no está en el indice añadirlo
                         self.index[field][token] = []
-                        
+
                     # ======== Poscionales ========
                     if not self.positional:
                         # NORMAL 
                         if self.binary_search(self.index[field][token],artId) == -1:
                             # Añadir el articulo en orden creciente
-                            self.index[field][token].append(artId) 
+                            self.index[field][token].append(artId)
                     else:
                         # POSICIONALES -> 
                         # cada termino tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...]                       
@@ -368,15 +368,15 @@ class SAR_Indexer:
                         else:
                             # Añadir posición de la ocurrencia al índice
                             self.index[field][token][posicionEnLista][1].append(pos)
-                            
 
-                                
-                '''END FOR TOKENS'''              
-            '''END FOR FIELDS'''              
+
+
+                '''END FOR TOKENS'''
+            '''END FOR FIELDS'''
         '''END FOR LINES'''
         #if self.permuterm: self.make_permuterm()
         if self.stemming: self.make_stemming()
-        if self.permuterm: self.make_permuterm()             
+        if self.permuterm: self.make_permuterm()
 
 
 
@@ -423,21 +423,21 @@ class SAR_Indexer:
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
-            
+
         # recuperar los tokens y sacarles sus steams.
         for (field,_) in self.fields:
             words = self.index[field].keys()
-                        
+
             for token in words:
                 stem: str = self.stemmer.stem(token)
-                
+
                 if stem not in self.sindex[field]:
                     self.sindex[field][stem] = []
-                
+
                 if token not in self.sindex[field][stem]:
                     self.insertOrdenado(self.sindex[field][stem],token)
-         
-    
+
+
     def make_permuterm(self):
         """
 
@@ -447,21 +447,21 @@ class SAR_Indexer:
 
 
         """
-        
+
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
         print(self.ptindex.keys())
-        for field in self.ptindex: 
+        for field in self.ptindex:
             # if field == "url":
             #     self.ptindex[field].extend([token for token in self.index[field].keys()])
             #     self.ptindex[field] = list(set(self.ptindex[field]))
             #     continue
-            
+
             words = self.index[field].keys()
-           
-            
-               
+
+
+
             for token in words:
                 permuterm = [(f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1)]
                 for item in permuterm:
@@ -474,8 +474,8 @@ class SAR_Indexer:
         Muestra estadisticas de los indices
         
         """
-        
-         
+
+
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
@@ -486,28 +486,28 @@ class SAR_Indexer:
         res+=f"{sep2}\n"
         res+=f"Number of indexed articles {len(self.articles)}\n"
         res+=f"{sep2}\n"
-        
-        
-        
+
+
+
         indices = ["tokens"]
         if(self.stemming): indices.append("stemming")
         if(self.permuterm): indices.append("permuterm")
         indice_dic = {}
         for indice in indices:
-        
+
             res+=f"{indice.upper()}:\n"
             if indice == "tokens": indice_dic = self.index
             elif indice == "stemming": indice_dic = self.sindex
             elif indice == "permuterm": indice_dic = self.ptindex
             if self.multifield:
-                
+
                 for field in self.fields:
-                    
+
                     res+=f"\t# of tokens in '{field[0]}': {len(indice_dic[field[0]])}\n"
             else: res+=f"\t# of tokens in 'all': {len(indice_dic['all'])}\n"
             res+=f"{sep2}\n"
-        
-       
+
+
         if self.positional:
             res+= "Positional queries are allowed\n"
         else: res+= "Positional queries are NOT allowed\n"
@@ -517,7 +517,7 @@ class SAR_Indexer:
 
 
 
-        
+
 
 
 
@@ -550,10 +550,18 @@ class SAR_Indexer:
 
         """
         # a
-        query = re.findall(r"\w+(?:-\w+)*\:\w+[\*|\?|\w]+|\w+(?:-\w+)*\:'[^']*'|\w+(?:-\w+)*\:\"[^\"]*\"|'[^']*'|\"[^\"]*\"|\w+[\*|\?|\w]+|\(|\)", query.lower())
+        multi_f = "\w+[\-\w+]*\:"
+        word = "\w+(?:\*|\?|\w)+"
+        comillas_s = "'[^']*'"
+        comillas_d = "\"[^\"]*\""
+        parentesis = "\(|\)"
+        query = re.findall(
+            fr"(?:{multi_f})*(?:{comillas_s}|{comillas_d}|{word})|{parentesis}",
+            query.lower())
         op = []
         docs = []
         for i in query:
+            i.strip()
             if i in {'and', 'not', 'or', '(', ')'}:
                 op.append(i)
             else:
@@ -676,7 +684,7 @@ class SAR_Indexer:
             return self.get_permuterm(term,field)
         elif self.use_stemming:
             return self.get_stemming(term,field)
-        else: 
+        else:
             # Comprobar como se ha contruido el índice, si con poscionales o normal.
             _, aux = self.index[field].popitem()
             if isinstance(aux[0], tuple):
@@ -731,24 +739,24 @@ class SAR_Indexer:
                     # Recuperar ocurrencias del siguiente token del artIds
                     ocurrenciasAux = None
                     for (id, ocurrenciasSearch) in posting:
-                        if id == artId: 
+                        if id == artId:
                             ocurrenciasAux = ocurrenciasSearch
-                    
+
                     # Ver si en las posición que tendría que tener el siguiene token en el artículo está
                     # Si el articulo NO aparece en la posting list del siguiente token fuera
-                    if ocurrenciasAux is None or (pos + posRelativa + 1) not in ocurrenciasAux: 
+                    if ocurrenciasAux is None or (pos + posRelativa + 1) not in ocurrenciasAux:
                         ValidoOcurrencia = False
                         break
                 '''End for mirar otras postings'''
-        
+
                 if ValidoOcurrencia:
                     ValidoArtId = True
-                    break                             
+                    break
             '''End for mirar posiciones de cada artId'''
-            
-            if ValidoArtId: 
+
+            if ValidoArtId:
                 res.append(artId)
-        '''End for mirar todos artId''' 
+        '''End for mirar todos artId'''
         return res # Ya está ordenado de menor a mayor
 
     def get_stemming(self, term:str, field: Optional[str]=None):
@@ -766,14 +774,14 @@ class SAR_Indexer:
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
-        
+
         stem = self.stemmer.stem(term)
         res = []
-        
+
         if stem not in self.sindex[field]:
             # si ese stem no se ha llegado a indexar
             return res
-        
+
         # Puede haber más de un tocen asociado a un stem
         for token in self.sindex[field][stem]:
             # Insertar de manera ordenada (de menor a mayor) en la respuesta los DocIds 
@@ -782,11 +790,11 @@ class SAR_Indexer:
                     # Primer elemento
                     res.append(docId)
                     continue
-                if docId > res[len(res)-1]: 
+                if docId > res[len(res)-1]:
                     # si va en la última posicion
                     res.insert(len(res),docId)
                     continue
-                
+
                 for i in range(len(res)):
                     # Inserción ordenada
                     if res[i] <  docId: continue
@@ -794,7 +802,7 @@ class SAR_Indexer:
                     if res[i] >  docId: res.insert(i,docId); break
         return res
 
-            
+
 
     def get_permuterm(self, term:str, field:Optional[str]=None):
         """
@@ -808,19 +816,19 @@ class SAR_Indexer:
         return: posting list
 
         """
-       
-            
+
+
         ##################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
         ##################################################
-        
+
         res = []
         pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
         permuterm = f'{term[pos+1:]}${term[:pos]}'
-        
+
         #Buscamos una posición de la lista self.ptindex[field] donde aparece el permuterm
         permuterm_pos = self.binary_search(self.ptindex[field],permuterm)
-        
+
         #Esta posición puede no ser la primera, de forma que navegamos hacia atrás hasta encontrar la primera
         if permuterm_pos == -1: return []
         # while not encontrado_primero:
@@ -832,24 +840,24 @@ class SAR_Indexer:
         #         permuterm_pos -= 1
         #     elif self.ptindex[field][permuterm_pos -1][0] != permuterm_pos:
         #         encontrado_primero = True
-        
+
         #Si hemos encontrado la primera posición, buscamos todos los tokens cuyo permuterm es el mismo
-        #y concatenamos sus postings list.    
-       
+        #y concatenamos sus postings list.
+
         while permuterm_pos < len(self.ptindex[field]) and self.ptindex[field][permuterm_pos][0].startswith(permuterm):
             token = self.ptindex[field][permuterm_pos][1]
             if self.index[field][token] not in res:
                 res += self.index[field][token]
             permuterm_pos += 1
-        
+
         #Devolvemos la postings list ordenada
         return sorted(res)
-        
+
         # for perm, token in self.ptindex[field].values():
         #     if permuterm in perm:
         #         res += self.index[field][token]
         # return res
-        
+
 
 
 
@@ -998,7 +1006,7 @@ class SAR_Indexer:
                     print(f'{query}\t{result}')
                 else:
                     print(f'>>>>{query}\t{reference} != {result}<<<<')
-                    errors = True                    
+                    errors = True
             else:
                 print(query)
         return not errors
@@ -1031,7 +1039,7 @@ class SAR_Indexer:
                     ndespues = ndespues -1
                 cotasup = cotasup +1
             return (cotainf+1, cotasup)
-        
+
         terminos = []
         query_normalizada = re.findall(r"'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
         for t in query_normalizada:
