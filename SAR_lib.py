@@ -824,17 +824,17 @@ class SAR_Indexer:
 
             # Para posicionales y permuterm porque son listas de tuplas
             if type(tuple_list[0]) == tuple:
-                auxLista = [i[0] for i in tuple_list]
+                aux_lista = [i[0] for i in tuple_list]
             else:
-                auxLista = tuple_list
+                aux_lista = tuple_list
 
             izq = 0
-            der = len(auxLista) - 1
+            der = len(aux_lista) - 1
             while izq <= der:
                 mitad = izq + (der - izq) // 2
-                if auxLista[mitad].startswith(permuterm):
+                if aux_lista[mitad].startswith(permuterm):
                     return mitad
-                elif auxLista[mitad] < permuterm:
+                elif aux_lista[mitad] < permuterm:
                     izq = mitad + 1
                 else:
                     der = mitad - 1
@@ -843,6 +843,9 @@ class SAR_Indexer:
         ##################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
         ##################################################
+        #Comprueba si se usan indices posicionales ya que la indexación en la lista es diferente
+        use_positionals =  isinstance(self.index[field].popitem()[1][0], tuple)
+
         res = []
         pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
         permuterm = f'{term[pos+1:]}${term[:pos]}'
@@ -871,7 +874,7 @@ class SAR_Indexer:
         while permuterm_pos < len(self.ptindex[field]) and self.ptindex[field][permuterm_pos][0].startswith(permuterm):
             token = self.ptindex[field][permuterm_pos][1]
             docs = self.index[field][token]
-            docs = [item[0] for item in docs]
+            if use_positionals: docs = [item[0] for item in docs]
             for doc in docs:
                 if doc not in res:
                     res.append(doc)
@@ -1075,27 +1078,34 @@ class SAR_Indexer:
                 terminos.append(t)
         print(terminos)
         q = self.solve_query(query)
-        for i in range(len(q) if self.show_all else min(10,len(q))):
+
+        indice_min = 10
+        if self.show_all:
+            indice_min = len(q)
+
+
+        for i in range(len(q) if self.show_all else min(indice_min,len(q))):
             # La posting list tiene forma [1,2,3,4,...,n]. q[i] es el i-ésimo articulo
             # self.articles[q[i]] es la tupla (docID, artID), de la que buscamos el doc.
             # A continuación abrimos el documento
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
-            for t in terminos:
-                #resnippet = re.compile(f"\W+{t}\W+")
-                resnippet = rf'\b{re.escape(t)}\b' # re.compile(f"\W+{t}\W+")
-                #pos = resnippet.search(doc['all'], re.IGNORECASE)
-                pos = re.search(resnippet, doc['all'].lower())
-                # patron = r'\b' + re.escape(palabra_buscada) + r'\b'
-                if pos:
-                    pos = pos.span()
-                else:
-                    pos = -1
-                if pos != -1:
-                    (cotainf, cotasup) = npalabras(6,len(terminos)+5,doc['all'],pos[0])
-                    #print(doc['all'][pos[0]-5:pos[0]+15])
-                    print(f"...{doc['all'][cotainf+1:cotasup-1]}...\n")
+            if self.show_snippet:
+                for t in terminos:
+                    #resnippet = re.compile(f"\W+{t}\W+")
+                    resnippet = rf'\b{re.escape(t)}\b' # re.compile(f"\W+{t}\W+")
+                    #pos = resnippet.search(doc['all'], re.IGNORECASE)
+                    pos = re.search(resnippet, doc['all'].lower())
+                    # patron = r'\b' + re.escape(palabra_buscada) + r'\b'
+                    if pos:
+                        pos = pos.span()
+                    else:
+                        pos = -1
+                    if pos != -1:
+                        (cotainf, cotasup) = npalabras(6,len(terminos)+5,doc['all'],pos[0])
+                        #print(doc['all'][pos[0]-5:pos[0]+15])
+                        print(f"...{doc['all'][cotainf+1:cotasup-1]}...\n")
 
 
         print(f"Number of results: {len(q)}")
