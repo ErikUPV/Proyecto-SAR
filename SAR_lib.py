@@ -859,20 +859,9 @@ class SAR_Indexer:
 
         while permuterm_pos > 0 and self.ptindex[field][permuterm_pos - 1][0].startswith(permuterm):
             permuterm_pos -= 1
-        # while not encontrado_primero:
-        #     if permuterm_pos == -1:
-        #         pass
-        #     elif permuterm_pos == 0:
-        #         encontrado_primero = True
-        #     elif self.ptindex[field][permuterm_pos - 1][0] == permuterm:
-        #         permuterm_pos -= 1
-        #     elif self.ptindex[field][permuterm_pos -1][0] != permuterm_pos:
-        #         encontrado_primero = True
 
         #Si hemos encontrado la primera posición, buscamos todos los tokens cuyo permuterm es el mismo
         #y concatenamos sus postings list.
-
-
 
         while permuterm_pos < len(self.ptindex[field]) and self.ptindex[field][permuterm_pos][0].startswith(permuterm):
             if not es_asterisco and len(self.ptindex[field][permuterm_pos][0]) != len(permuterm) + 1:
