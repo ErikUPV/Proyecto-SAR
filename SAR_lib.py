@@ -1083,16 +1083,18 @@ class SAR_Indexer:
                 fr"(?:{multi_f})*(?:{comillas_s}|{comillas_d}|{word})|{parentesis}",
                 query.lower())
 
-            fields = ['all' for i in query_normalizada]
-            terminos = ['' for i in query_normalizada]
+            terminos = []
+            fields = []
             for i, t in enumerate(query_normalizada):
                 if t not in {'and', 'not', 'or', '(', ')'}:
                     if t.find(":") > 0:
-                        fields[i] = t[:t.find(":")]
+                        fields.append(t[:t.find(":")])
                         t = t[t.find(":") + 1:]
+                    else:
+                        fields.append('all')
                     if t[0] == '\'':
                         t = t[1:-1]
-                    terminos[i] = t
+                    terminos.append(t)
             print(terminos)
 
         for i in range(len(q) if self.show_all else min(indice_min,len(q))):
