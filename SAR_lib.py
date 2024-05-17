@@ -551,7 +551,7 @@ class SAR_Indexer:
         """
         # a
         multi_f = r"\w+[\-\w+]*\:"
-        word = r"\w+(?:\*|\?|\w)+"
+        word = r"(?:\*|\?|\w)+"
         comillas_s = r"'[^']*'"
         comillas_d = r"\"[^\"]*\""
         parentesis = r"\(|\)"
@@ -1075,7 +1075,7 @@ class SAR_Indexer:
         if self.show_snippet:
 
             multi_f = r"\w+[\-\w+]*\:"
-            word = r"\w+(?:\*|\?|\w)+"
+            word = r"(?:\*|\?|\w)+"
             comillas_s = r"'[^']*'"
             comillas_d = r"\"[^\"]*\""
             parentesis = r"\(|\)"
