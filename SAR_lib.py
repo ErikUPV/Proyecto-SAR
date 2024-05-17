@@ -1108,6 +1108,11 @@ class SAR_Indexer:
                 for i,t in enumerate(terminos):
                     #resnippet = re.compile(f"\W+{t}\W+")
                     resnippet = rf'\b{re.escape(t)}\b' # re.compile(f"\W+{t}\W+")
+                    if len(self.ptindex) > 0:
+                        comodin = t.rfind('*') + t.rfind('?') + 1
+                        primP = t[:comodin]
+                        segP = t[comodin+1:]
+                        resnippet = rf'\b{re.escape(primP)}\w+{re.escape(segP)}\b'
                     #pos = resnippet.search(doc['all'], re.IGNORECASE)
                     pos = re.search(resnippet, doc[fields[i]].lower())
                     # patron = r'\b' + re.escape(palabra_buscada) + r'\b'
@@ -1116,7 +1121,7 @@ class SAR_Indexer:
                     else:
                         pos = -1
                     if pos != -1:
-                        (cotainf, cotasup) = npalabras(6,len(terminos)+5,doc[fields[i]],pos[0])
+                        (cotainf, cotasup) = npalabras(6,len(terminos)+8,doc[fields[i]],pos[0])
                         #print(doc['all'][pos[0]-5:pos[0]+15])
                         print(f'{cotainf} : {cotasup}')
                         print(f"...{doc[fields[i]][cotainf+1:cotasup-1]}...\n")
