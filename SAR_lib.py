@@ -550,11 +550,11 @@ class SAR_Indexer:
 
         """
         # a
-        multi_f = "\w+[\-\w+]*\:"
-        word = "\w+(?:\*|\?|\w)+"
-        comillas_s = "'[^']*'"
-        comillas_d = "\"[^\"]*\""
-        parentesis = "\(|\)"
+        multi_f = r"\w+[\-\w+]*\:"
+        word = r"\w+(?:\*|\?|\w)+"
+        comillas_s = r"'[^']*'"
+        comillas_d = r"\"[^\"]*\""
+        parentesis = r"\(|\)"
         query = re.findall(
             fr"(?:{multi_f})*(?:{comillas_s}|{comillas_d}|{word})|{parentesis}",
             query.lower())
@@ -678,7 +678,7 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-        if len(self.tokenize(term)) > 1:
+        if len(self.tokenize(term) ) > 1 and "*" not in term and "?" not in term:
             return self.get_positionals(self.tokenize(term),field)
         elif '*' in term or '?' in term:
             return self.get_permuterm(term,field)
@@ -816,7 +816,29 @@ class SAR_Indexer:
         return: posting list
 
         """
+        #Utilizamos otra función de binary search porque hay que utilizar startswith en vez de
+        #igualdades.
+        def  binary_search_permuterm(tuple_list, permuterm):
+            if tuple_list is None: return -1
+            if len(tuple_list) == 0: return -1
 
+            # Para posicionales y permuterm porque son listas de tuplas
+            if type(tuple_list[0]) == tuple:
+                auxLista = [i[0] for i in tuple_list]
+            else:
+                auxLista = tuple_list
+
+            izq = 0
+            der = len(auxLista) - 1
+            while izq <= der:
+                mitad = izq + (der - izq) // 2
+                if auxLista[mitad].startswith(permuterm):
+                    return mitad
+                elif auxLista[mitad] < permuterm:
+                    izq = mitad + 1
+                else:
+                    der = mitad - 1
+            return -1
 
         ##################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
@@ -827,10 +849,13 @@ class SAR_Indexer:
         permuterm = f'{term[pos+1:]}${term[:pos]}'
 
         #Buscamos una posición de la lista self.ptindex[field] donde aparece el permuterm
-        permuterm_pos = self.binary_search(self.ptindex[field],permuterm)
+        permuterm_pos = binary_search_permuterm(self.ptindex[field], permuterm)
 
         #Esta posición puede no ser la primera, de forma que navegamos hacia atrás hasta encontrar la primera
         if permuterm_pos == -1: return []
+
+        while permuterm_pos > 0 and self.ptindex[field][permuterm_pos - 1][0].startswith(permuterm):
+            permuterm_pos -= 1
         # while not encontrado_primero:
         #     if permuterm_pos == -1:
         #         pass
