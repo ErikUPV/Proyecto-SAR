@@ -843,7 +843,6 @@ class SAR_Indexer:
         ##################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
         ##################################################
-
         res = []
         pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
         permuterm = f'{term[pos+1:]}${term[:pos]}'
@@ -871,10 +870,12 @@ class SAR_Indexer:
 
         while permuterm_pos < len(self.ptindex[field]) and self.ptindex[field][permuterm_pos][0].startswith(permuterm):
             token = self.ptindex[field][permuterm_pos][1]
-            if self.index[field][token] not in res:
-                res += self.index[field][token]
+            docs = self.index[field][token]
+            docs = [item[0] for item in docs]
+            for doc in docs:
+                if doc not in res:
+                    res.append(doc)
             permuterm_pos += 1
-
         #Devolvemos la postings list ordenada
         return sorted(res)
 
@@ -1066,7 +1067,7 @@ class SAR_Indexer:
             return (cotainf+1, cotasup)
 
         terminos = []
-        query_normalizada = re.findall(r"'[^']*'|\"[^\"]*\"|\w+|\(|\)", query.lower())
+        query_normalizada = re.findall(r"'[^']*'|\"[^\"]*\"|[\w(?:\*|\?)]+|\(|\)", query.lower())
         for t in query_normalizada:
             if t not in {'and', 'not', 'or', '(', ')'}:
                 if t[0] == '\'':
@@ -1075,6 +1076,9 @@ class SAR_Indexer:
         print(terminos)
         q = self.solve_query(query)
         for i in range(len(q) if self.show_all else min(10,len(q))):
+
+
+
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
