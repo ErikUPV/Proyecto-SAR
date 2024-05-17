@@ -844,9 +844,10 @@ class SAR_Indexer:
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA PERMUTERM ##
         ##################################################
         #Comprueba si se usan indices posicionales ya que la indexación en la lista es diferente
-        use_positionals =  isinstance(self.index[field].popitem()[1][0], tuple)
+        use_positionals = isinstance(self.index[field].popitem()[1][0], tuple)
 
         res = []
+        es_asterisco = term.rfind('*') != -1
         pos = term.rfind('*') + term.rfind('?') +1  # Suponemos que solo hay o un asterisco o un interrogante, no los 2 a la vez
         permuterm = f'{term[pos+1:]}${term[:pos]}'
 
@@ -871,13 +872,20 @@ class SAR_Indexer:
         #Si hemos encontrado la primera posición, buscamos todos los tokens cuyo permuterm es el mismo
         #y concatenamos sus postings list.
 
+
+
         while permuterm_pos < len(self.ptindex[field]) and self.ptindex[field][permuterm_pos][0].startswith(permuterm):
+            if not es_asterisco and len(self.ptindex[field][permuterm_pos][0]) != len(permuterm) + 1:
+                permuterm_pos += 1
+                continue
             token = self.ptindex[field][permuterm_pos][1]
-            docs = self.index[field][token]
+            docs = self.index[field].get(token, [])
             if use_positionals: docs = [item[0] for item in docs]
+
             for doc in docs:
                 if doc not in res:
                     res.append(doc)
+
             permuterm_pos += 1
         #Devolvemos la postings list ordenada
         return sorted(res)
