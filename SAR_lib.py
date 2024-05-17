@@ -1108,7 +1108,7 @@ class SAR_Indexer:
                 for i,t in enumerate(terminos):
                     #resnippet = re.compile(f"\W+{t}\W+")
                     resnippet = rf'\b{re.escape(t)}\b' # re.compile(f"\W+{t}\W+")
-                    if '*' in t or '?' in t:
+                    if ('*' in t or '?' in t) and len(self.ptindex) > 0:
                         es_asterisco = t.rfind('*') != -1
                         comodin = t.rfind('*') + t.rfind('?') + 1
                         primP = t[:comodin]
