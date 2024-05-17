@@ -1076,9 +1076,9 @@ class SAR_Indexer:
         print(terminos)
         q = self.solve_query(query)
         for i in range(len(q) if self.show_all else min(10,len(q))):
-
-
-
+            # La posting list tiene forma [1,2,3,4,...,n]. q[i] es el i-ésimo articulo
+            # self.articles[q[i]] es la tupla (docID, artID), de la que buscamos el doc.
+            # A continuación abrimos el documento
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
