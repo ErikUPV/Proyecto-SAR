@@ -352,9 +352,9 @@ class SAR_Indexer:
                         # Si el token no está en el indice añadirlo
                         self.index[field][token] = []
 
-                    # ======== Poscionales ========
+                    # ======== Poscionales o Normal ========
                     if not self.positional:
-                        # NORMAL 
+                        # NORMAL ->
                         if self.binary_search(self.index[field][token],artId) == -1:
                             # Añadir el articulo en orden creciente
                             self.index[field][token].append(artId)
@@ -368,13 +368,9 @@ class SAR_Indexer:
                         else:
                             # Añadir posición de la ocurrencia al índice
                             self.index[field][token][posicionEnLista][1].append(pos)
-
-
-
                 '''END FOR TOKENS'''
             '''END FOR FIELDS'''
         '''END FOR LINES'''
-        #if self.permuterm: self.make_permuterm()
         if self.stemming: self.make_stemming()
         if self.permuterm: self.make_permuterm()
 
@@ -678,10 +674,10 @@ class SAR_Indexer:
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
-        if len(self.tokenize(term) ) > 1 and "*" not in term and "?" not in term:
-            return self.get_positionals(self.tokenize(term),field)
-        elif '*' in term or '?' in term:
+        if '*' in term or '?' in term:
             return self.get_permuterm(term,field)
+        elif len(self.tokenize(term) ) > 1:
+            return self.get_positionals(self.tokenize(term),field)
         elif self.use_stemming:
             return self.get_stemming(term,field)
         else:
@@ -786,20 +782,7 @@ class SAR_Indexer:
         for token in self.sindex[field][stem]:
             # Insertar de manera ordenada (de menor a mayor) en la respuesta los DocIds 
             for docId in self.index[field][token]:
-                if len(res) == 0:
-                    # Primer elemento
-                    res.append(docId)
-                    continue
-                if docId > res[len(res)-1]:
-                    # si va en la última posicion
-                    res.insert(len(res),docId)
-                    continue
-
-                for i in range(len(res)):
-                    # Inserción ordenada
-                    if res[i] <  docId: continue
-                    if res[i] == docId: break
-                    if res[i] >  docId: res.insert(i,docId); break
+                self.insertOrdenado(res,docId)
         return res
 
 
