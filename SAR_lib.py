@@ -1066,20 +1066,34 @@ class SAR_Indexer:
                 cotasup = cotasup +1
             return (cotainf+1, cotasup)
 
-        terminos = []
-        query_normalizada = re.findall(r"'[^']*'|\"[^\"]*\"|[\w(?:\*|\?)]+|\(|\)", query.lower())
-        for t in query_normalizada:
-            if t not in {'and', 'not', 'or', '(', ')'}:
-                if t[0] == '\'':
-                    t = t[1:-1]
-                terminos.append(t)
-        print(terminos)
         q = self.solve_query(query)
 
         indice_min = 10
         if self.show_all:
             indice_min = len(q)
 
+        if self.show_snippet:
+
+            multi_f = r"\w+[\-\w+]*\:"
+            word = r"\w+(?:\*|\?|\w)+"
+            comillas_s = r"'[^']*'"
+            comillas_d = r"\"[^\"]*\""
+            parentesis = r"\(|\)"
+            query_normalizada = re.findall(
+                fr"(?:{multi_f})*(?:{comillas_s}|{comillas_d}|{word})|{parentesis}",
+                query.lower())
+
+            fields = ['all' for i in query_normalizada]
+            terminos = ['' for i in query_normalizada]
+            for i, t in enumerate(query_normalizada):
+                if t not in {'and', 'not', 'or', '(', ')'}:
+                    if t.find(":") > 0:
+                        fields[i] = t[:t.find(":")]
+                        t = t[t.find(":") + 1:]
+                    if t[0] == '\'':
+                        t = t[1:-1]
+                    terminos[i] = t
+            print(terminos)
 
         for i in range(len(q) if self.show_all else min(indice_min,len(q))):
             # La posting list tiene forma [1,2,3,4,...,n]. q[i] es el i-ésimo articulo
@@ -1089,20 +1103,21 @@ class SAR_Indexer:
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
             if self.show_snippet:
-                for t in terminos:
+                for i,t in enumerate(terminos):
                     #resnippet = re.compile(f"\W+{t}\W+")
                     resnippet = rf'\b{re.escape(t)}\b' # re.compile(f"\W+{t}\W+")
                     #pos = resnippet.search(doc['all'], re.IGNORECASE)
-                    pos = re.search(resnippet, doc['all'].lower())
+                    pos = re.search(resnippet, doc[fields[i]].lower())
                     # patron = r'\b' + re.escape(palabra_buscada) + r'\b'
                     if pos:
                         pos = pos.span()
                     else:
                         pos = -1
                     if pos != -1:
-                        (cotainf, cotasup) = npalabras(6,len(terminos)+5,doc['all'],pos[0])
+                        (cotainf, cotasup) = npalabras(6,len(terminos)+5,doc[fields[i]],pos[0])
                         #print(doc['all'][pos[0]-5:pos[0]+15])
-                        print(f"...{doc['all'][cotainf+1:cotasup-1]}...\n")
+                        print(f'{cotainf} : {cotasup}')
+                        print(f"...{doc[fields[i]][cotainf+1:cotasup-1]}...\n")
 
 
         print(f"Number of results: {len(q)}")
