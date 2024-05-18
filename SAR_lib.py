@@ -46,7 +46,7 @@ class SAR_Indexer:
         self.index = {} # hash para el indice invertido de terminos --> clave: termino, valor: posting list
         self.sindex = {} # hash para el indice invertido de stems --> clave: stem, valor: lista con los terminos que tienen ese stem
         self.ptindex = {} # hash para el indice permuterm.
-        self.docs = {} # diccionario de terminos --> clave: entero(docid),  valor: ruta del fichero.
+        self.docs = {} # diccionario de terminos --> clave: entero(doc_id),  valor: ruta del fichero.
         self.weight = {} # hash de terminos para el pesado, ranking de resultados.
         ''' 
         Para cada termino
@@ -54,7 +54,7 @@ class SAR_Indexer:
         'nArt': Numero de art en los que aparece
         'terDocFrec': Has para cada articulo, cuantas veces se ha visto ese token en cada articulo
         '''
-        self.articles = {} # hash de articulos --> clave entero (artid), valor: la info necesaria para diferencia los artículos dentro de su fichero
+        self.articles = {} # hash de articulos --> clave entero (art_id), valor: la info necesaria para diferencia los artículos dentro de su fichero
         self.tokenizer = re.compile(r'\W+') # expresion regular para hacer la tokenizacion
         self.stemmer = SnowballStemmer('spanish') # stemmer en castellano
         self.show_all = False # valor por defecto, se cambia con self.set_showall()
@@ -185,7 +185,7 @@ class SAR_Indexer:
                 der = mitad - 1
         return -1
 
-    def insertOrdenado(self, lista: list, element: any) -> None:
+    def insertar_ordenado(self, lista: list, element: any) -> None:
         """
         Insetar de manera ordenada un elemento en una lista
         
@@ -299,8 +299,8 @@ class SAR_Indexer:
         #################
 
         # ======== Actializar valores del indice ========
-        docId: int = len(self.docs)
-        self.docs[docId] = os.path.abspath(filename)
+        doc_id: int = len(self.docs)
+        self.docs[doc_id] = os.path.abspath(filename)
 
         for lineInFile, line in enumerate(open(filename)):
             # Dict[str, str]: claves: 'url', 'title', 'summary', 'all', 'section-name'
@@ -313,12 +313,12 @@ class SAR_Indexer:
             if text['url'] in self.urls: continue
 
             # ======== Actializar valores del indice ========
-            artId: int = len(self.articles)
-            self.articles[artId] = (docId,lineInFile)
+            art_id: int = len(self.articles)
+            self.articles[art_id] = (doc_id,lineInFile)
 
             # Añadir url del artículo a sus diccionario 
             self.urls.add(text["url"])
-            self.index['url'][text["url"]] = artId
+            self.index['url'][text["url"]] = art_id
 
             # ======== Actualizar los indices ========
             for (field,ifIndex) in self.fields:
@@ -340,12 +340,12 @@ class SAR_Indexer:
                             }
                         '''En if'''
                         self.weight[token]['nArt'] += 1
-                        self.weight[token]['terDocFrec'][artId] = 0
-                        self.insertOrdenado(visitedTokens, token)
+                        self.weight[token]['terDocFrec'][art_id] = 0
+                        self.insertar_ordenado(visitedTokens, token)
                     '''En if'''
 
                     self.weight[token]['frec'] += 1
-                    self.weight[token]['terDocFrec'][artId] += 1
+                    self.weight[token]['terDocFrec'][art_id] += 1
 
                     # ======== Indices ========
                     if token not in self.index[field]:
@@ -355,16 +355,16 @@ class SAR_Indexer:
                     # ======== Poscionales o Normal ========
                     if not self.positional:
                         # NORMAL ->
-                        if self.binary_search(self.index[field][token],artId) == -1:
+                        if self.binary_search(self.index[field][token],art_id) == -1:
                             # Añadir el articulo en orden creciente
-                            self.index[field][token].append(artId)
+                            self.index[field][token].append(art_id)
                     else:
                         # POSICIONALES -> 
-                        # cada termino tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...]                       
-                        posicionEnLista = self.binary_search(self.index[field][token],artId)
+                        # cada termino tiene una lista con forma [ (art_id,[ocrurrencias]), (art_id,[ocrurrencias]),...]                       
+                        posicionEnLista = self.binary_search(self.index[field][token],art_id)
                         if  posicionEnLista == -1:
                             # Añadir el articulo en orden creciente con su lista de posicionales
-                            self.index[field][token].append((artId,[pos]))
+                            self.index[field][token].append((art_id,[pos]))
                         else:
                             # Añadir posición de la ocurrencia al índice
                             self.index[field][token][posicionEnLista][1].append(pos)
@@ -431,7 +431,7 @@ class SAR_Indexer:
                     self.sindex[field][stem] = []
 
                 if token not in self.sindex[field][stem]:
-                    self.insertOrdenado(self.sindex[field][stem],token)
+                    self.insertar_ordenado(self.sindex[field][stem],token)
 
 
     def make_permuterm(self):
@@ -461,7 +461,7 @@ class SAR_Indexer:
             for token in words:
                 permuterm = [(f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1)]
                 for item in permuterm:
-                    self.insertOrdenado(self.ptindex[field],item)
+                    self.insertar_ordenado(self.ptindex[field],item)
 
     def show_stats(self):
         """
@@ -685,11 +685,11 @@ class SAR_Indexer:
             _, aux = self.index[field].popitem()
             if isinstance(aux[0], tuple):
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
-                # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
+                # Cada token tiene una lista con forma [ (art_id,[ocrurrencias]), (art_id,[ocrurrencias]),...] 
                 if term not in self.index[field]:
                     return []
                 else:
-                    return [artId for (artId,_) in self.index[field][term]]
+                    return [art_id for (art_id,_) in self.index[field][term]]
             else:
                 # Si no hay ninguna opción activada
                 return self.index[field].get(term,[])
@@ -723,36 +723,36 @@ class SAR_Indexer:
         # Iterar sobre todos los articulos que estén en la primera postingList
         # si ya no aparecen en ella no serán devueltos en la consulta
         # 
-        # Cada token tiene una lista con forma [ (artId,[ocrurrencias]), (artId,[ocrurrencias]),...] 
-        for (artId,ocurrenciasArtId) in postings.pop(0): # Primera posting list
-            ValidoArtId: bool = False
-            ValidoOcurrencia: bool = True
+        # Cada token tiene una lista con forma [ (art_id,[ocrurrencias]), (art_id,[ocrurrencias]),...] 
+        for (art_id,ocurrenciasart_id) in postings.pop(0): # Primera posting list
+            valido_art_id: bool = False
+            valido_ocurrencia: bool = True
             # mirar las ocurrencias en las listas asociadas a los siguientes términos
             # El rojo y
-            for pos in ocurrenciasArtId:
-                ValidoOcurrencia = True
-                for posRelativa, posting in enumerate(postings):
-                    # Recuperar ocurrencias del siguiente token del artIds
-                    ocurrenciasAux = None
-                    for (id, ocurrenciasSearch) in posting:
-                        if id == artId:
-                            ocurrenciasAux = ocurrenciasSearch
+            for pos in ocurrenciasart_id:
+                valido_ocurrencia = True
+                for pos_relativa, posting in enumerate(postings):
+                    # Recuperar ocurrencias del siguiente token del art_ids
+                    ocurrecias_aux = None
+                    for (id, ocurrecias_search) in posting:
+                        if id == art_id:
+                            ocurrecias_aux = ocurrecias_search
 
                     # Ver si en las posición que tendría que tener el siguiene token en el artículo está
                     # Si el articulo NO aparece en la posting list del siguiente token fuera
-                    if ocurrenciasAux is None or (pos + posRelativa + 1) not in ocurrenciasAux:
-                        ValidoOcurrencia = False
+                    if ocurrecias_aux is None or (pos + pos_relativa + 1) not in ocurrecias_aux:
+                        valido_ocurrencia = False
                         break
                 '''End for mirar otras postings'''
 
-                if ValidoOcurrencia:
-                    ValidoArtId = True
+                if valido_ocurrencia:
+                    valido_art_id = True
                     break
-            '''End for mirar posiciones de cada artId'''
+            '''End for mirar posiciones de cada art_id'''
 
-            if ValidoArtId:
-                res.append(artId)
-        '''End for mirar todos artId'''
+            if valido_art_id:
+                res.append(art_id)
+        '''End for mirar todos art_id'''
         return res # Ya está ordenado de menor a mayor
 
     def get_stemming(self, term:str, field: Optional[str]=None):
@@ -781,8 +781,8 @@ class SAR_Indexer:
         # Puede haber más de un tocen asociado a un stem
         for token in self.sindex[field][stem]:
             # Insertar de manera ordenada (de menor a mayor) en la respuesta los DocIds 
-            for docId in self.index[field][token]:
-                self.insertOrdenado(res,docId)
+            for doc_id in self.index[field][token]:
+                self.insertar_ordenado(res,doc_id)
         return res
 
 
@@ -879,7 +879,7 @@ class SAR_Indexer:
 
         param:  "p": posting list
 
-        return: posting list con todos los artid exceptos los contenidos en p
+        return: posting list con todos los art_id exceptos los contenidos en p
         """
 
         j = 0
@@ -909,7 +909,7 @@ class SAR_Indexer:
 
         param:  "p1", "p2": posting lists sobre las que calcular
 
-        return: posting list con los artid incluidos en p1 y p2
+        return: posting list con los art_id incluidos en p1 y p2
         """
 
         ########################################
@@ -939,7 +939,7 @@ class SAR_Indexer:
 
         param:  "p1", "p2": posting lists sobre las que calcular
 
-        return: posting list con los artid incluidos de p1 o p2
+        return: posting list con los art_id incluidos de p1 o p2
         """
 
         ########################################
@@ -972,7 +972,7 @@ class SAR_Indexer:
 
         param:  "p1", "p2": posting lists sobre las que calcular
 
-        return: posting list con los artid incluidos de p1 y no en p2
+        return: posting list con los art_id incluidos de p1 y no en p2
         """
         ########################################################
         ## COMPLETAR PARA TODAS LAS VERSIONES SI ES NECESARIO ##
@@ -1082,7 +1082,7 @@ class SAR_Indexer:
 
         for i in range(len(q) if self.show_all else min(indice_min,len(q))):
             # La posting list tiene forma [1,2,3,4,...,n]. q[i] es el i-ésimo articulo
-            # self.articles[q[i]] es la tupla (docID, artID), de la que buscamos el doc.
+            # self.articles[q[i]] es la tupla (doc_id, art_id), de la que buscamos el doc.
             # A continuación abrimos el documento
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
