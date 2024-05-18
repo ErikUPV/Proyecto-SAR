@@ -1112,7 +1112,15 @@ class SAR_Indexer:
                         (cotainf, cotasup) = npalabras(6,len(terminos)+8,doc[fields[i]],pos[0])
                         #print(doc['all'][pos[0]-5:pos[0]+15])
                         print(f'{cotainf} : {cotasup}')
-                        print(f"...{doc[fields[i]][cotainf+1:cotasup-1]}...\n")
+                        if fields[i] == 'title':
+                            print(f"Title:\n{doc[fields[i]]}\n")
+                        elif fields[i] == 'section-name':
+                            print(f"Section name: {doc[fields[i]][cotainf:cotasup]}\n")
+                        elif fields[i] == 'summary':
+                            print(f"...{doc[fields[i]][cotainf+2:cotasup-1]}...\n")
+                        else:
+                            print(fields[i])
+                            print(f"...{doc[fields[i]][cotainf+1:cotasup-1]}...\n")
 
 
         print(f"Number of results: {len(q)}")
