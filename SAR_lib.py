@@ -586,6 +586,7 @@ class SAR_Indexer:
                         ini = False
                 elif i < len(op) and op[i] == '(':
                     res.append([])
+                    temporal.append('-')
                     i += 1
                 else: #Caso Normal
                     res[-1] = docs[j].copy()
