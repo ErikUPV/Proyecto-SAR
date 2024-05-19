@@ -297,7 +297,7 @@ class SAR_Indexer:
         #################
         ### COMPLETAR ###
         #################
-
+        print("indexing file: " + filename)
         # ======== Actializar valores del indice ========
         doc_id: int = len(self.docs)
         self.docs[doc_id] = os.path.abspath(filename)
@@ -436,18 +436,15 @@ class SAR_Indexer:
 
     def make_permuterm(self):
         """
-
+        
         Crea el indice permuterm (self.ptindex) para los terminos de todos los indices.
 
         NECESARIO PARA LA AMPLIACION DE PERMUTERM
-
-
+        
         """
-
         ####################################################
         ## COMPLETAR PARA FUNCIONALIDAD EXTRA DE STEMMING ##
         ####################################################
-        print(self.ptindex.keys())
         for field in self.ptindex:
             # if field == "url":
             #     self.ptindex[field].extend([token for token in self.index[field].keys()])
@@ -470,8 +467,6 @@ class SAR_Indexer:
         Muestra estadisticas de los indices
         
         """
-
-
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
@@ -511,12 +506,6 @@ class SAR_Indexer:
         print(res)
        # print([token for token in self.ptindex['all'] if token[0].startswith("a$")])
 
-
-
-
-
-
-
     #################################
     ###                           ###
     ###   PARTE 2: RECUPERACION   ###
@@ -528,7 +517,6 @@ class SAR_Indexer:
     ###   PARTE 2.1: RECUPERACION   ###
     ###                             ###
     ###################################
-
 
     def solve_query(self, query:str, prev:Dict={}):
         """
@@ -649,10 +637,6 @@ class SAR_Indexer:
                 i += 1
         return res[0]
 
-
-
-
-
     def get_posting(self, term:str, field:Optional[str]=None):
         """
 
@@ -755,6 +739,7 @@ class SAR_Indexer:
         '''End for mirar todos art_id'''
         return res # Ya está ordenado de menor a mayor
 
+
     def get_stemming(self, term:str, field: Optional[str]=None):
         """
 
@@ -784,7 +769,6 @@ class SAR_Indexer:
             for doc_id in self.index[field][token]:
                 self.insertar_ordenado(res,doc_id)
         return res
-
 
 
     def get_permuterm(self, term:str, field:Optional[str]=None):
@@ -868,8 +852,6 @@ class SAR_Indexer:
         # return res
 
 
-
-
     def reverse_posting(self, p:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -896,10 +878,7 @@ class SAR_Indexer:
         # l = [i for i in allP if i not in p]
 
         return l
-
-
-
-
+    
 
     def and_posting(self, p1:list, p2:list):
         """
@@ -911,7 +890,6 @@ class SAR_Indexer:
 
         return: posting list con los art_id incluidos en p1 y p2
         """
-
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
@@ -929,8 +907,6 @@ class SAR_Indexer:
         return l
 
 
-
-
     def or_posting(self, p1:list, p2:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -941,7 +917,6 @@ class SAR_Indexer:
 
         return: posting list con los art_id incluidos de p1 o p2
         """
-
         ########################################
         ## COMPLETAR PARA TODAS LAS VERSIONES ##
         ########################################
@@ -978,9 +953,6 @@ class SAR_Indexer:
         ## COMPLETAR PARA TODAS LAS VERSIONES SI ES NECESARIO ##
         ########################################################
         return [i for i in p1 if i not in p2]
-
-
-
 
 
     #####################################
