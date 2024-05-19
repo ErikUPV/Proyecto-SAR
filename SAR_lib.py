@@ -574,6 +574,7 @@ class SAR_Indexer:
                         ini = False
                 elif i < len(op) and op[i] == '(':
                     res.append([])
+                    temporal.append('-')
                     i += 1
                 else: #Caso Normal
                     res[-1] = docs[j].copy()
@@ -863,22 +864,13 @@ class SAR_Indexer:
 
         return: posting list con todos los art_id exceptos los contenidos en p
         """
-
-        j = 0
         allP = list(self.articles.keys())
-        l = []
-        for i,n in enumerate(allP):
-            if j >= len(p):
-                break
-            if i != p[j]:
-                l.append(i)
-            else:
-                j+=1
-        l+=allP[n:]
-        # l = [i for i in allP if i not in p]
+        res = self.minus_posting(allP,p)
+        return res
 
-        return l
-    
+
+
+
 
     def and_posting(self, p1:list, p2:list):
         """
