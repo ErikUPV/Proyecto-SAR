@@ -765,9 +765,12 @@ class SAR_Indexer:
             return res
 
         # Puede haber más de un tocen asociado a un stem
+        
         for token in self.sindex[field][stem]:
             # Insertar de manera ordenada (de menor a mayor) en la respuesta los DocIds 
             for doc_id in self.index[field][token]:
+                if type(doc_id) == tuple:
+                    doc_id = doc_id[0]
                 self.insertar_ordenado(res,doc_id)
         return res
 
@@ -869,9 +872,6 @@ class SAR_Indexer:
         return res
 
 
-
-
-
     def and_posting(self, p1:list, p2:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -957,7 +957,11 @@ class SAR_Indexer:
         results = []
         for query in ql:
             if len(query) > 0 and query[0] != '#':
-                r = self.solve_query(query)
+                try:
+                    r = self.solve_query(query)
+                except Exception:
+                    print("ERROR EN:" + query)
+                
                 results.append(len(r))
                 if verbose:
                     print(f'{query}\t{len(r)}')
@@ -1013,8 +1017,11 @@ class SAR_Indexer:
                 cotasup = cotasup +1
             return (cotainf+1, cotasup)
 
-        q = self.solve_query(query)
-
+        try:
+            q = self.solve_query(query)
+        except Exception:
+            print("ERROR EN:" + query)
+            
         indice_min = 10
         if self.show_all:
             indice_min = len(q)
