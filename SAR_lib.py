@@ -881,21 +881,9 @@ class SAR_Indexer:
 
         return: posting list con todos los art_id exceptos los contenidos en p
         """
-
-        j = 0
         allP = list(self.articles.keys())
-        l = []
-        for i,n in enumerate(allP):
-            if j >= len(p):
-                break
-            if i != p[j]:
-                l.append(i)
-            else:
-                j+=1
-        l+=allP[n:]
-        # l = [i for i in allP if i not in p]
-
-        return l
+        res = self.minus_posting(allP,p)
+        return res
 
 
 
