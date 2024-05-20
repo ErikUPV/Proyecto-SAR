@@ -991,7 +991,7 @@ class SAR_Indexer:
                 print(query)
         return not errors
 
-    # Desarrolladores: Alex Ramos y Héctor Bernal
+    # Desarrolladores: Héctor Bernal y Alex
     def solve_and_show(self, query:str):
         """
         NECESARIO PARA TODAS LAS VERSIONES
