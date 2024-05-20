@@ -459,6 +459,8 @@ class SAR_Indexer:
     '''ERIK'''
     def show_stats(self):
         """
+        Desarrollador: Erik
+
         NECESARIO PARA TODAS LAS VERSIONES
         
         Muestra estadisticas de los indices
@@ -529,7 +531,7 @@ class SAR_Indexer:
         return: posting list con el resultado de la query
 
         """
-        # a
+        # Regex para separar adeecuadamente la query
         multi_f = r"\w+[\-\w+]*\:"
         word = r"(?:\*|\?|\w)+"
         comillas_s = r"'[^']*'"
@@ -538,37 +540,43 @@ class SAR_Indexer:
         query = re.findall(
             fr"(?:{multi_f})*(?:{comillas_s}|{comillas_d}|{word})|{parentesis}",
             query.lower())
-        op = []
-        docs = []
+
+        # Separar los terminos de las operaciones, '(' y ')' tambien cuentan como operaciones
+        op = [] # Lista de operadores
+        docs = [] # Lista de posting list de los terminos
         for i in query:
             i.strip()
             if i in {'and', 'not', 'or', '(', ')'}:
                 op.append(i)
             else:
                 n = 'all'
-                if i.find(":")>0:
+                if i.find(":")>0: # En caso de multifield se usara le field correspondiente
                     n = i[:i.find(":")]
                     i = i[i.find(":")+1:]
+                # añadir el posting list del termino a la lista quitando las comillas en caso de tener
                 docs.append(self.get_posting(i[1:len(i)-1] if i[0]=="'" or i[0]=='"' else i,n))
+        # Caso sin operadores
         if len(op) == 0:
             return docs[0]
-        j ,i=0,0
-        temporal = []
-        res = [[]]
-        ini = True
+        # j: indice de los posting list de terminos
+        # i: indice de los operadores
+        j, i=0, 0
+        temporal = [] # pila de operaadores previos a subquery
+        res = [[]] # Pila de ejecucion de respuesta
+        ini = True # Indicaador de Inicio de query/sub-query
         while i < len(op):
-            if ini:
-                if op[i] == 'not': # 1ºBloque: Inicio en query y sub-query
+            if ini: # 1ºBloque: Inicio en query y sub-query
+                if op[i] == 'not': # Casos NOT
                     i += 1
-                    if i < len(op) and op[i] == '(':
+                    if i < len(op) and op[i] == '(': # Caso Sub-query
                         res.append([])
                         i += 1
                         temporal.append('not')
-                    else:
+                    else: # Caso Normal
                         res[-1] = self.reverse_posting(docs[j].copy())
                         j += 1
                         ini = False
-                elif i < len(op) and op[i] == '(':
+                elif i < len(op) and op[i] == '(': # Caso Sub-query
                     res.append([])
                     temporal.append('-')
                     i += 1
@@ -578,42 +586,42 @@ class SAR_Indexer:
                     ini = False
             elif op[i] == 'and': # 2ºBloque: Realiza la operaacion AND
                 i += 1
-                if i < len(op) and op[i] == 'not':
+                if i < len(op) and op[i] == 'not': # Casos NOT
                     i += 1
-                    if i < len(op) and op[i] == '(':
+                    if i < len(op) and op[i] == '(': # Caso Sub-query
                         res.append([])
                         i += 1
                         temporal.append('except')
                         ini = True
-                    else:
+                    else: # Caso Normal
                         res[-1] = self.minus_posting(res[-1], docs[j])
                         j += 1
-                elif i < len(op) and op[i] == '(':
+                elif i < len(op) and op[i] == '(': # Caso Sub-query
                     res.append([])
                     i += 1
                     temporal.append('and')
                     ini = True
-                else:
+                else: # Caso Normal
                     res[-1] = self.and_posting(res[-1], docs[j])
                     j += 1
             elif op[i] == 'or': # 3ºBloque: Realiza la operaacion OR
                 i += 1
-                if i < len(op) and op[i] == 'not':
+                if i < len(op) and op[i] == 'not': # Casos NOT
                     i += 1
-                    if i < len(op) and op[i] == '(':
+                    if i < len(op) and op[i] == '(': # Caso Sub-query
                         res.append([])
                         i += 1
                         temporal.append('ornot')
                         ini = True
-                    else:
+                    else: # Caso Normal
                         res[-1] = self.or_posting(res[-1], self.reverse_posting(docs[j]))
                         j += 1
-                elif i < len(op) and op[i] == '(':
+                elif i < len(op) and op[i] == '(': # Caso Sub-query
                     res.append([])
                     i += 1
                     temporal.append('or')
                     ini = True
-                else:
+                else: # Caso Normal
                     res[-1] = self.or_posting(res[-1], docs[j])
                     j += 1
             elif op[i] == ')':# 4º Bloque: Resuelve los parentesis
@@ -1049,6 +1057,8 @@ class SAR_Indexer:
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
+
+            #Desarrollador: Héctor
             if self.show_snippet:
                 for i,t in enumerate(terminos):
                     #resnippet = re.compile(f"\W+{t}\W+")
