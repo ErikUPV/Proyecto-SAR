@@ -156,8 +156,9 @@ class SAR_Indexer:
     ###                         ###
     ###############################ç
 
+    '''ERIK'''
     def binary_search(self, lista: list, perm: any) -> int:
-        """ ERIK
+        """ 
         Hace una búsqueda binaria de un elemento en una lista y devuelve su posición.
         
         :param: lista: lista sobre la que buscar
@@ -185,8 +186,9 @@ class SAR_Indexer:
                 der = mitad - 1
         return -1
 
+    '''HÉCTOR'''
     def insertar_ordenado(self, lista: list, element: any) -> None:
-        """ MIQUEL
+        """ 
         Insetar de manera ordenada un elemento en una lista
         
         :param: lista: lista sobre la que inserar
@@ -280,9 +282,9 @@ class SAR_Indexer:
 
         return article
 
-
+    '''MIQUEL'''
     def index_file(self, filename:str):
-        """ MIQUEL
+        """ 
         Indexa el contenido de un fichero.
         
         input: "filename" es el nombre de un fichero generado por el Crawler cada línea es un objeto json
@@ -404,10 +406,9 @@ class SAR_Indexer:
         """
         return self.tokenizer.sub(' ', text.lower()).split()
 
-
+    '''MIQUEL'''
     def make_stemming(self):
-        """ MIQUEL
-
+        """ 
         Crea el indice de stemming (self.sindex) para los terminos de todos los indices.
 
         NECESARIO PARA LA AMPLIACION DE STEMMING.
@@ -432,10 +433,9 @@ class SAR_Indexer:
                 if token not in self.sindex[field][stem]:
                     self.insertar_ordenado(self.sindex[field][stem],token)
 
-
+    '''HÉCTOR'''
     def make_permuterm(self):
-        """
-        
+        """ 
         Crea el indice permuterm (self.ptindex) para los terminos de todos los indices.
 
         NECESARIO PARA LA AMPLIACION DE PERMUTERM
@@ -456,6 +456,7 @@ class SAR_Indexer:
                 for item in permuterm:
                     self.insertar_ordenado(self.ptindex[field],item)
 
+    '''ERIK'''
     def show_stats(self):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -473,8 +474,6 @@ class SAR_Indexer:
         res+=f"{sep2}\n"
         res+=f"Number of indexed articles {len(self.articles)}\n"
         res+=f"{sep2}\n"
-
-
 
         indices = ["tokens"]
         if(self.stemming): indices.append("stemming")
@@ -514,6 +513,7 @@ class SAR_Indexer:
     ###                             ###
     ###################################
 
+    '''ALEX'''
     def solve_query(self, query:str, prev:Dict={}):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -634,8 +634,9 @@ class SAR_Indexer:
                 i += 1
         return res[0]
 
+    '''MIQUEL'''
     def get_posting(self, term:str, field:Optional[str]=None):
-        """ MIQUEL
+        """ 
         Devuelve la posting list asociada a un termino. 
         Dependiendo de las ampliaciones implementadas "get_posting" puede llamar a:
             - self.get_positionals: para la ampliacion de posicionales 
@@ -674,9 +675,9 @@ class SAR_Indexer:
                 # Si no hay ninguna opción activada
                 return self.index[field].get(term,[])
 
-
+    '''MIQUEL'''
     def get_positionals(self, terms:str, field):
-        """ MIQUEL
+        """ 
         Devuelve la posting list asociada a una secuencia de terminos consecutivos.
         NECESARIO PARA LA AMPLIACION DE POSICIONALES
 
@@ -734,9 +735,9 @@ class SAR_Indexer:
         '''End for mirar todos art_id'''
         return res # Ya está ordenado de menor a mayor
 
-
+    '''HÉCTOR'''
     def get_stemming(self, term:str, field: Optional[str]=None):
-        """ MIQUEL
+        """ 
         Devuelve la posting list asociada al stem de un termino.
         NECESARIO PARA LA AMPLIACION DE STEMMING
 
@@ -767,9 +768,9 @@ class SAR_Indexer:
         return res
 
 
+    '''HÉCTOR'''
     def get_permuterm(self, term:str, field:Optional[str]=None):
         """
-
         Devuelve la posting list asociada a un termino utilizando el indice permuterm.
         NECESARIO PARA LA AMPLIACION DE PERMUTERM
 
@@ -847,7 +848,7 @@ class SAR_Indexer:
         #         res += self.index[field][token]
         # return res
 
-
+    '''ALEX'''
     def reverse_posting(self, p:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -863,7 +864,7 @@ class SAR_Indexer:
         res = self.minus_posting(allP,p)
         return res
 
-
+    '''ALEX'''
     def and_posting(self, p1:list, p2:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -890,7 +891,7 @@ class SAR_Indexer:
                 j += 1
         return l
 
-
+    '''ALEX'''
     def or_posting(self, p1:list, p2:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -921,7 +922,7 @@ class SAR_Indexer:
         l += p2[j:]
         return l
 
-
+    '''ALEX'''
     def minus_posting(self, p1, p2):
         """
         OPCIONAL PARA TODAS LAS VERSIONES
@@ -944,7 +945,6 @@ class SAR_Indexer:
     ### PARTE 2.2: MOSTRAR RESULTADOS ###
     ###                               ###
     #####################################
-
     def solve_and_count(self, ql:List[str], verbose:bool=True) -> List:
         results = []
         for query in ql:
@@ -963,7 +963,6 @@ class SAR_Indexer:
                     print(query)
         return results
 
-
     def solve_and_test(self, ql:List[str]) -> bool:
         errors = False
         for line in ql:
@@ -980,7 +979,7 @@ class SAR_Indexer:
                 print(query)
         return not errors
 
-
+    '''ALEX Y HÉCTOR'''
     def solve_and_show(self, query:str):
         """
         NECESARIO PARA TODAS LAS VERSIONES
