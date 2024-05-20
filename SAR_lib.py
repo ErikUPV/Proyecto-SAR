@@ -435,7 +435,8 @@ class SAR_Indexer:
 
     def make_permuterm(self):
         """
-        
+        Desarrolladores: Héctor y Erik
+
         Crea el indice permuterm (self.ptindex) para los terminos de todos los indices.
 
         NECESARIO PARA LA AMPLIACION DE PERMUTERM
@@ -458,6 +459,8 @@ class SAR_Indexer:
 
     def show_stats(self):
         """
+        Desarrollador: Erik
+
         NECESARIO PARA TODAS LAS VERSIONES
         
         Muestra estadisticas de los indices
@@ -776,6 +779,7 @@ class SAR_Indexer:
 
     def get_permuterm(self, term:str, field:Optional[str]=None):
         """
+        Desarrolladores: Héctor y Erik
 
         Devuelve la posting list asociada a un termino utilizando el indice permuterm.
         NECESARIO PARA LA AMPLIACION DE PERMUTERM
@@ -1057,6 +1061,8 @@ class SAR_Indexer:
             doc = open(self.docs[self.articles[q[i]][0]], "r")
             doc = self.parse_article(doc.readlines()[self.articles[q[i]][1]])
             print(f"{i} ({q[i]}) {doc['title']}: {doc['url']}")
+
+            #Desarrollador: Héctor
             if self.show_snippet:
                 for i,t in enumerate(terminos):
                     #resnippet = re.compile(f"\W+{t}\W+")
