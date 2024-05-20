@@ -157,7 +157,7 @@ class SAR_Indexer:
     ###############################ç
 
     def binary_search(self, lista: list, perm: any) -> int:
-        """
+        """ ERIK
         Hace una búsqueda binaria de un elemento en una lista y devuelve su posición.
         
         :param: lista: lista sobre la que buscar
@@ -186,7 +186,7 @@ class SAR_Indexer:
         return -1
 
     def insertar_ordenado(self, lista: list, element: any) -> None:
-        """
+        """ MIQUEL
         Insetar de manera ordenada un elemento en una lista
         
         :param: lista: lista sobre la que inserar
@@ -209,8 +209,7 @@ class SAR_Indexer:
 
 
     def already_in_index(self, article:Dict) -> bool:
-        """
-
+        """ 
         Args:
             article (Dict): diccionario con la información de un artículo
 
@@ -283,7 +282,7 @@ class SAR_Indexer:
 
 
     def index_file(self, filename:str):
-        """
+        """ MIQUEL
         Indexa el contenido de un fichero.
         
         input: "filename" es el nombre de un fichero generado por el Crawler cada línea es un objeto json
@@ -407,7 +406,7 @@ class SAR_Indexer:
 
 
     def make_stemming(self):
-        """
+        """ MIQUEL
 
         Crea el indice de stemming (self.sindex) para los terminos de todos los indices.
 
@@ -450,11 +449,8 @@ class SAR_Indexer:
             #     self.ptindex[field].extend([token for token in self.index[field].keys()])
             #     self.ptindex[field] = list(set(self.ptindex[field]))
             #     continue
-
             words = self.index[field].keys()
-
-
-
+            
             for token in words:
                 permuterm = [(f'{token[j:]}${token[:j]}', token) for j in range(len(token)+1)]
                 for item in permuterm:
@@ -518,6 +514,7 @@ class SAR_Indexer:
     ###                             ###
     ###################################
 
+    # Desarrollador: Alex Ramos Barrachina
     def solve_query(self, query:str, prev:Dict={}):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -645,8 +642,7 @@ class SAR_Indexer:
         return res[0]
 
     def get_posting(self, term:str, field:Optional[str]=None):
-        """
-
+        """ MIQUEL
         Devuelve la posting list asociada a un termino. 
         Dependiendo de las ampliaciones implementadas "get_posting" puede llamar a:
             - self.get_positionals: para la ampliacion de posicionales 
@@ -687,8 +683,7 @@ class SAR_Indexer:
 
 
     def get_positionals(self, terms:str, field):
-        """
-
+        """ MIQUEL
         Devuelve la posting list asociada a una secuencia de terminos consecutivos.
         NECESARIO PARA LA AMPLIACION DE POSICIONALES
 
@@ -748,8 +743,7 @@ class SAR_Indexer:
 
 
     def get_stemming(self, term:str, field: Optional[str]=None):
-        """
-
+        """ MIQUEL
         Devuelve la posting list asociada al stem de un termino.
         NECESARIO PARA LA AMPLIACION DE STEMMING
 
@@ -771,7 +765,6 @@ class SAR_Indexer:
             return res
 
         # Puede haber más de un tocen asociado a un stem
-        
         for token in self.sindex[field][stem]:
             # Insertar de manera ordenada (de menor a mayor) en la respuesta los DocIds 
             for doc_id in self.index[field][token]:
@@ -861,7 +854,7 @@ class SAR_Indexer:
         #         res += self.index[field][token]
         # return res
 
-
+    # Desarrollador: Alex Ramos Barrachina
     def reverse_posting(self, p:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -877,7 +870,7 @@ class SAR_Indexer:
         res = self.minus_posting(allP,p)
         return res
 
-
+    # Desarrollador: Alex Ramos Barrachina
     def and_posting(self, p1:list, p2:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -904,7 +897,7 @@ class SAR_Indexer:
                 j += 1
         return l
 
-
+    # Desarrollador: Alex Ramos Barrachina
     def or_posting(self, p1:list, p2:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -935,7 +928,7 @@ class SAR_Indexer:
         l += p2[j:]
         return l
 
-
+    # Desarrollador: Alex Ramos Barrachina
     def minus_posting(self, p1, p2):
         """
         OPCIONAL PARA TODAS LAS VERSIONES
@@ -994,7 +987,7 @@ class SAR_Indexer:
                 print(query)
         return not errors
 
-
+    # Desarrolladores: Alex Ramos y Héctor Bernal
     def solve_and_show(self, query:str):
         """
         NECESARIO PARA TODAS LAS VERSIONES
