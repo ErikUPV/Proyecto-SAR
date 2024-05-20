@@ -514,6 +514,7 @@ class SAR_Indexer:
     ###                             ###
     ###################################
 
+    # Desarrollador: Alex Ramos Barrachina
     def solve_query(self, query:str, prev:Dict={}):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -847,7 +848,7 @@ class SAR_Indexer:
         #         res += self.index[field][token]
         # return res
 
-
+    # Desarrollador: Alex Ramos Barrachina
     def reverse_posting(self, p:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -863,7 +864,7 @@ class SAR_Indexer:
         res = self.minus_posting(allP,p)
         return res
 
-
+    # Desarrollador: Alex Ramos Barrachina
     def and_posting(self, p1:list, p2:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -890,7 +891,7 @@ class SAR_Indexer:
                 j += 1
         return l
 
-
+    # Desarrollador: Alex Ramos Barrachina
     def or_posting(self, p1:list, p2:list):
         """
         NECESARIO PARA TODAS LAS VERSIONES
@@ -921,7 +922,7 @@ class SAR_Indexer:
         l += p2[j:]
         return l
 
-
+    # Desarrollador: Alex Ramos Barrachina
     def minus_posting(self, p1, p2):
         """
         OPCIONAL PARA TODAS LAS VERSIONES
@@ -980,7 +981,7 @@ class SAR_Indexer:
                 print(query)
         return not errors
 
-
+    # Desarrolladores: Alex Ramos y Héctor Bernal
     def solve_and_show(self, query:str):
         """
         NECESARIO PARA TODAS LAS VERSIONES
