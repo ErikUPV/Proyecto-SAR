@@ -1,5 +1,8 @@
 import numpy as np
-
+'''
+1- Hacer Backpointers
+2- Reduccion de coste
+'''
 def levenshtein_matriz(x, y, threshold=None):
     # esta versión no utiliza threshold, se pone porque se puede
     # invocar con él, en cuyo caso se ignora
