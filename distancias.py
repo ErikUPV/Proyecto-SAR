@@ -2,6 +2,12 @@ import numpy as np
 '''
 1- Hacer Backpointers
 2- Reduccion de coste
+3- si la comparacion entre las palabras es demasiado grande no hace falta la matriz
+4- Modificar Indexer y Searcher para usar levenstein
+(Opcional)
+5- Damerau Restringido
+6- Damerau Intemedio
+7- Backpointers tmb
 '''
 def levenshtein_matriz(x, y, threshold=None):
     # esta versión no utiliza threshold, se pone porque se puede
