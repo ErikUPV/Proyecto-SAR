@@ -52,10 +52,15 @@ def levenshtein_edicion(x, y, threshold=None): #ALEX
     res = [(x[lenX-1],y[lenY-1])]
     paux = B[lenX][lenY]
     while D[paux[0],paux[1]] != 0:
-        res.insert(0,(x[paux[0]],y[paux[1]]))
-        paux = B[paux[0]][paux[1]]
-    res.insert(0,(x[paux[0]],y[paux[1]]))
-    print(D)
+        aux = B[paux[0]][paux[1]]
+        if aux[0] == paux[0]:
+            res.insert(0, ('', y[paux[1]-1]))
+        elif aux[1] == paux[1]:
+            res.insert(0,(x[paux[0]-1], ''))
+        else:
+            res.insert(0,(x[paux[0]-1],y[paux[1]-1]))
+        paux = aux
+    #res.insert(0,(x[paux[0]-1],y[paux[1]-1]))
     return (D[lenX, lenY],res)
 
 def levenshtein_reduccion(x, y, threshold=None): #ERIK
