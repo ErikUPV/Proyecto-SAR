@@ -1,36 +1,36 @@
 from distancias import *
 
 test = [
-    ("camarero","caramelos"),
-    ("ejemplo","campos"),
-    ("algoritmo","algortimo"),
-    ("algoritmo","algortximo"),
-    ("algoritmo","lagortimo"),
-    ("algoritmo","agaloritom"),
-    ("algoritmo","algormio"),
-    ("acb","ba")]
+    ("camarero", "caramelos"),
+    ("ejemplo", "campos"),
+    ("algoritmo", "algortimo"),
+    ("algoritmo", "algortximo"),
+    ("algoritmo", "lagortimo"),
+    ("algoritmo", "agaloritom"),
+    ("algoritmo", "algormio"),
+    ("acb", "ba")]
 
-lon_primera = max(len(x) for x,y in test)
-lon_segunda = max(len(y) for x,y in test)
+lon_primera = max(len(x) for x, y in test)
+lon_segunda = max(len(y) for x, y in test)
 
-lontotal = lon_primera+1+lon_segunda+sum(1+len(name) for name in opcionesSpell.keys())
+lontotal = lon_primera + 1 + lon_segunda + sum(1 + len(name) for name in opcionesSpell.keys())
 
-for cota in [100,3,2,1]:
+for cota in [100, 3, 2, 1]:
 
-    print("-"*lontotal)
+    print("-" * lontotal)
     cadenacota = f"(Cota {cota})"
-    
-    print(f"{cadenacota:{2+lon_primera+lon_segunda}}",end="")
+
+    print(f"{cadenacota:{2 + lon_primera + lon_segunda}}", end="")
     for name in opcionesSpell.keys():
-        print(name,end=" ")
+        print(name, end=" ")
     print()
 
-    for x,y in test:
-        print(f"{x:{lon_primera}} {y:{lon_segunda}}",end="")
-        for name,function in opcionesSpell.items():
-            print(f" {function(x,y,cota):{len(name)}}",end="")
+    for x, y in test:
+        print(f"{x:{lon_primera}} {y:{lon_segunda}}", end="")
+        for name, function in opcionesSpell.items():
+            print(f" {function(x, y, cota):{len(name)}}", end="")
         print()
-                 
+
 """
 Salida del programa:
 
@@ -75,4 +75,6 @@ algoritmo agaloritom             5             5           2             2      
 algoritmo algormio               3             3           2             2          3         2          2         2
 acb       ba                     3             3           2             2          3         2          2         2
 
+
 """         
+

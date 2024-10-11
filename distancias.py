@@ -60,11 +60,52 @@ def levenshtein_edicion(x, y, threshold=None): #ALEX
 
 def levenshtein_reduccion(x, y, threshold=None): #ERIK
     # completar versión con reducción coste espacial
-    return 0 # COMPLETAR Y REEMPLAZAR ESTA PARTE
+    lenX, lenY = len(x), len(y)
+    vcurrent = np.zeros(lenX + 1, dtype=int)
+    vprev = np.zeros(lenX + 1, dtype=int)
+
+    #B = np.zeros((lenX + 1, lenY + 1), dtype=int)
+    for i in range (1, lenX + 1):
+        vprev[i] = vprev[i - 1] + 1
+        #B[i][0] = (i - 1, 0)
+    for j in range(1, lenY + 1):
+        vcurrent[0] = vprev[0] + 1
+        #B[0][j] = (0, j - 1)
+        for i in range(1, lenX + 1):
+            vcurrent[i] = min(
+                vcurrent[i - 1] + 1,
+                vprev[i] + 1,
+                vprev[i - 1] + (x[i - 1] != y[j - 1]),
+            )
+        vcurrent, vprev = vprev, vcurrent
+    return vprev[lenX]
 
 def levenshtein(x, y, threshold): #HECTOR
     # completar versión reducción coste espacial y parada por threshold
-    return min(0,threshold+1) # COMPLETAR Y REEMPLAZAR ESTA PARTE
+    lenX, lenY = len(x), len(y)
+    vcurrent = np.zeros(lenX + 1, dtype=int)
+    vprev = np.zeros(lenX + 1, dtype=int)
+
+    #B = np.zeros((lenX + 1, lenY + 1), dtype=int)
+    for i in range (1, lenX + 1):
+        vprev[i] = vprev[i - 1] + 1
+        #B[i][0] = (i - 1, 0)
+    for j in range(1, lenY + 1):
+        vcurrent[0] = vprev[0] + 1
+        #B[0][j] = (0, j - 1)
+        for i in range(1, lenX + 1):
+            vcurrent[i] = min(
+                vcurrent[i - 1] + 1,
+                vprev[i] + 1,
+                vprev[i - 1] + (x[i - 1] != y[j - 1]),
+            )
+        # print(f"El minimo es: {min(vcurrent)}\n")
+        if min(vcurrent) > threshold:
+            return threshold+1
+        vcurrent, vprev = vprev, vcurrent
+    if vprev[lenX] > threshold:
+        return threshold+1
+    return vprev[lenX]
 
 def levenshtein_cota_optimista(x, y, threshold): #JAVIER
     return 0 # COMPLETAR Y REEMPLAZAR ESTA PARTE
