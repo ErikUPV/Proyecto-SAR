@@ -39,13 +39,28 @@ def levenshtein_edicion(x, y, threshold=None):
         D[0][j] = D[0][j - 1] + 1
         B[0][j] = (0,j-1)
         for i in range(1, lenX + 1):
+            """
             D[i][j] = min(
                 D[i - 1][j] + 1,
                 D[i][j - 1] + 1,
                 D[i - 1][j - 1] + (x[i - 1] != y[j - 1]),
-            )
-    return D[lenX, lenY]
-    return 0,[] # COMPLETAR Y REEMPLAZAR ESTA PARTE
+            )"""
+            if D[i - 1][j] + 1 >= D[i][j - 1] + 1:
+                p = (i, j-1)
+            else:
+                p = (i-1,j)
+            if D[i - 1][j - 1] + (x[i - 1] != y[j - 1]) <= D[p[0]][p[1]] + 1:
+                p=(i-1, j-1)
+                D[i][j] = D[i - 1][j - 1] + (x[i - 1] != y[j - 1])
+            else:
+                D[i][j] = D[p[0]][p[1]] + 1
+            B[i][j] = p
+    res = [(x[lenX],y[lenY])]
+    paux = B[lenX][lenY]
+    while D[paux[0],paux[1]] != 0:
+        res.append((x[paux[0]],y[paux[1]]))
+        paux = B[paux[0]][paux[1]]
+    return (D[lenX, lenY],res)
 
 def levenshtein_reduccion(x, y, threshold=None):
     # completar versión con reducción coste espacial
