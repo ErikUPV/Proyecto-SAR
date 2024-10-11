@@ -13,7 +13,7 @@ def levenshtein_matriz(x, y, threshold=None):
     # esta versión no utiliza threshold, se pone porque se puede
     # invocar con él, en cuyo caso se ignora
     lenX, lenY = len(x), len(y)
-    D = np.zeros((lenX + 1, lenY + 1), dtype=np.int)
+    D = np.zeros((lenX + 1, lenY + 1), dtype=int)
     for i in range(1, lenX + 1):
         D[i][0] = D[i - 1][0] + 1
     for j in range(1, lenY + 1):
@@ -30,21 +30,15 @@ def levenshtein_edicion(x, y, threshold=None): #ALEX
     # a partir de la versión levenshtein_matriz
 
     lenX, lenY = len(x), len(y)
-    D = np.zeros((lenX + 1, lenY + 1), dtype=np.int)
-    B = np.zeros((lenX + 1, lenY + 1), dtype=np.int)
+    D = np.zeros((lenX + 1, lenY + 1), dtype=int)
+    B = np.zeros((lenX + 1, lenY + 1), dtype=tuple)
     for i in range(1, lenX + 1):
         D[i][0] = D[i - 1][0] + 1
-        B[i][0] = (i-1,0)
+        B[i][0] = (i-1, 0)
     for j in range(1, lenY + 1):
         D[0][j] = D[0][j - 1] + 1
         B[0][j] = (0,j-1)
         for i in range(1, lenX + 1):
-            """
-            D[i][j] = min(
-                D[i - 1][j] + 1,
-                D[i][j - 1] + 1,
-                D[i - 1][j - 1] + (x[i - 1] != y[j - 1]),
-            )"""
             if D[i - 1][j] + 1 >= D[i][j - 1] + 1:
                 p = (i, j-1)
             else:
@@ -55,11 +49,13 @@ def levenshtein_edicion(x, y, threshold=None): #ALEX
             else:
                 D[i][j] = D[p[0]][p[1]] + 1
             B[i][j] = p
-    res = [(x[lenX],y[lenY])]
+    res = [(x[lenX-1],y[lenY-1])]
     paux = B[lenX][lenY]
     while D[paux[0],paux[1]] != 0:
-        res.append((x[paux[0]],y[paux[1]]))
+        res.insert(0,(x[paux[0]],y[paux[1]]))
         paux = B[paux[0]][paux[1]]
+    res.insert(0,(x[paux[0]],y[paux[1]]))
+    print(D)
     return (D[lenX, lenY],res)
 
 def levenshtein_reduccion(x, y, threshold=None): #ERIK
