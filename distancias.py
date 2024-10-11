@@ -37,6 +37,7 @@ def levenshtein_edicion(x, y, threshold=None):
         B[i][0] = (i-1,0)
     for j in range(1, lenY + 1):
         D[0][j] = D[0][j - 1] + 1
+        B[0][j] = (0,j-1)
         for i in range(1, lenX + 1):
             D[i][j] = min(
                 D[i - 1][j] + 1,
