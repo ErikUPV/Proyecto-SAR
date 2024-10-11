@@ -26,19 +26,19 @@ def levenshtein_matriz(x, y, threshold=None):
             )
     return D[lenX, lenY]
 
-def levenshtein_edicion(x, y, threshold=None):
+def levenshtein_edicion(x, y, threshold=None): #ALEX
     # a partir de la versión levenshtein_matriz
     return 0,[] # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
-def levenshtein_reduccion(x, y, threshold=None):
+def levenshtein_reduccion(x, y, threshold=None): #ERIK
     # completar versión con reducción coste espacial
     return 0 # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
-def levenshtein(x, y, threshold):
+def levenshtein(x, y, threshold): #HECTOR
     # completar versión reducción coste espacial y parada por threshold
     return min(0,threshold+1) # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
-def levenshtein_cota_optimista(x, y, threshold):
+def levenshtein_cota_optimista(x, y, threshold): #JAVIER
     return 0 # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
 def damerau_restricted_matriz(x, y, threshold=None):
