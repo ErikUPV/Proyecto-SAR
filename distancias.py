@@ -39,29 +39,30 @@ def levenshtein_edicion(x, y, threshold=None): #ALEX
         D[0][j] = D[0][j - 1] + 1
         B[0][j] = (0,j-1)
         for i in range(1, lenX + 1):
-            if D[i - 1][j] + 1 >= D[i][j - 1] + 1:
-                p = (i, j-1)
+            Add = D[i][j - 1] + 1
+            Del = D[i - 1][j] + 1
+            Mod = D[i - 1][j - 1] + (x[i - 1] != y[j - 1])
+
+            p = (i-1, j) if Add > Del else (i, j-1)
+            Sel = D[p[0]][p[1]] + 1
+            if Sel < Mod:
+                D[i][j] = Sel
             else:
-                p = (i-1,j)
-            if D[i - 1][j - 1] + (x[i - 1] != y[j - 1]) <= D[p[0]][p[1]] + 1:
-                p=(i-1, j-1)
-                D[i][j] = D[i - 1][j - 1] + (x[i - 1] != y[j - 1])
-            else:
-                D[i][j] = D[p[0]][p[1]] + 1
+                p = (i-1, j-1)
+                D[i][j] = Mod
             B[i][j] = p
-    res = [(x[lenX-1],y[lenY-1])]
-    paux = B[lenX][lenY]
-    while D[paux[0],paux[1]] != 0:
-        aux = B[paux[0]][paux[1]]
-        if aux[0] == paux[0]:
-            res.insert(0, ('', y[paux[1]-1]))
-        elif aux[1] == paux[1]:
-            res.insert(0,(x[paux[0]-1], ''))
+    res = []
+    act = (lenX, lenY)
+    while D[act[0], act[1]] != 0:
+        prev = B[act[0]][act[1]]
+        if prev[0] == act[0]:
+            res.insert(0, ('', y[act[1]-1]))
+        elif prev[1] == act[1]:
+            res.insert(0, (x[act[0]-1], ''))
         else:
-            res.insert(0,(x[paux[0]-1],y[paux[1]-1]))
-        paux = aux
-    #res.insert(0,(x[paux[0]-1],y[paux[1]-1]))
-    return (D[lenX, lenY],res)
+            res.insert(0, (x[act[0]-1], y[act[1]-1]))
+        act = prev
+    return D[lenX, lenY], res
 
 def levenshtein_reduccion(x, y, threshold=None): #ERIK
     # completar versión con reducción coste espacial
