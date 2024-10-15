@@ -39,18 +39,11 @@ def levenshtein_edicion(x, y, threshold=None): #ALEX
         D[0][j] = D[0][j - 1] + 1
         B[0][j] = (0,j-1)
         for i in range(1, lenX + 1):
-            Add = D[i][j - 1] + 1
-            Del = D[i - 1][j] + 1
-            Mod = D[i - 1][j - 1] + (x[i - 1] != y[j - 1])
-
-            p = (i-1, j) if Add > Del else (i, j-1)
-            Sel = D[p[0]][p[1]] + 1
-            if Sel < Mod:
-                D[i][j] = Sel
-            else:
-                p = (i-1, j-1)
-                D[i][j] = Mod
-            B[i][j] = p
+            D[i][j], B[i][j] = min(
+                (D[i - 1][j] + 1, (i - 1,j)),
+                (D[i][j - 1] + 1, (i, j - 1)),
+                (D[i - 1][j - 1] + (x[i - 1] != y[j - 1]), (i - 1, j - 1)),
+            )
     res = []
     act = (lenX, lenY)
     while D[act[0], act[1]] != 0:
