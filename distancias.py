@@ -170,7 +170,7 @@ def damerau_restricted(x, y, threshold=None):
     # versión con reducción coste espacial y parada por threshold
      return min(0,threshold+1) # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
-def damerau_intermediate_matriz(x, y, threshold=None):
+def damerau_intermediate_matriz(x, y, threshold=None): #ALEX
     # completar versión Damerau-Levenstein intermedia con matriz
     lenX, lenY = len(x), len(y)
 
@@ -191,7 +191,7 @@ def damerau_intermediate_matriz(x, y, threshold=None):
             )
     return D[lenX, lenY]
 
-def damerau_intermediate_edicion(x, y, threshold=None):
+def damerau_intermediate_edicion(x, y, threshold=None): #ALEX
     # partiendo de matrix_intermediate_damerau añadir recuperar
     # secuencia de operaciones de edición
     # completar versión Damerau-Levenstein intermedia con matriz
