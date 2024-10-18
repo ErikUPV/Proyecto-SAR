@@ -109,7 +109,28 @@ def levenshtein(x, y, threshold): #HECTOR
     return vprev[lenX]
 
 def levenshtein_cota_optimista(x, y, threshold): #JAVIER
-    return 0 # COMPLETAR Y REEMPLAZAR ESTA PARTE
+    counts = {}
+    for char in x:
+        if char in counts:
+            counts[char] += 1
+        else:
+            counts[char] = 1
+    for char in y:
+        if char in counts:
+            counts[char] -= 1
+        else:
+            counts[char] = -1
+    
+    pos = 0
+    neg = 0
+    for valor in counts.values():
+        if valor > 0:
+            pos += valor
+        elif valor < 0:
+            neg += abs(valor)
+    cota_optimista = max(pos, neg)
+    
+    return threshold + 1 if cota_optimista > threshold else levenshtein(x, y, threshold)
 
 def damerau_restricted_matriz(x, y, threshold=None): #ALEX
     # completar versión Damerau-Levenstein restringida con matriz
