@@ -126,7 +126,7 @@ def damerau_restricted_matriz(x, y, threshold=None): #ALEX
                 D[i - 1][j] + 1,
                 D[i][j - 1] + 1,
                 D[i - 1][j - 1] + (x[i - 1] != y[j - 1]),
-                D[i - 2][j - 2] + 1,
+                (D[i - 2][j - 2] + 1) if x[i - 1] == y[j - 2] and x[i - 2] == y[j - 1] else math.inf,
             )
     return D[lenX, lenY]
 
@@ -162,7 +162,7 @@ def damerau_restricted_edicion(x, y, threshold=None): #ALEX
             if prev[0] + 1 == act[0] and prev[1] + 1 == act[1]:
                 res.insert(0, (x[act[0] - 1], y[act[1] - 1]))
             else:
-                res.insert(0, (x[act[0] - 2: act[0]], y[act[1] - 2:act[1]]))
+                res.insert(0, (x[prev[0]: act[0]], y[prev[1]:act[1]]))
         act = prev
     return D[lenX, lenY], res # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
@@ -172,13 +172,65 @@ def damerau_restricted(x, y, threshold=None):
 
 def damerau_intermediate_matriz(x, y, threshold=None):
     # completar versión Damerau-Levenstein intermedia con matriz
-     return min(0,threshold+1) # COMPLETAR Y REEMPLAZAR ESTA PARTE
+    lenX, lenY = len(x), len(y)
+
+    D = np.zeros((lenX + 1, lenY + 1), dtype=int)
+    B = np.zeros((lenX + 1, lenY + 1), dtype=tuple)
+    for i in range(1, lenX + 1):
+        D[i][0] = D[i - 1][0] + 1
+    for j in range(1, lenY + 1):
+        D[0][j] = D[0][j - 1] + 1
+        for i in range(1, lenX + 1):
+            D[i][j] = min(
+                D[i - 1][j] + 1,
+                D[i][j - 1] + 1,
+                D[i - 1][j - 1] + (x[i - 1] != y[j - 1]),
+                (D[i - 2][j - 2] + 1) if x[i - 1] == y[j - 2] and x[i - 2] == y[j - 1] else math.inf,
+                (D[i - 3][j - 2] + 2) if x[i - 1] == y[j - 2] and x[i - 3] == y[j - 1] and x[i - 2] != y[j - 1] else math.inf,
+                (D[i - 2][j - 3] + 2) if x[i - 1] == y[j - 3] and x[i - 2] == y[j - 1] and x[i - 1] != y[j - 2] else math.inf,
+            )
+    return D[lenX, lenY]
 
 def damerau_intermediate_edicion(x, y, threshold=None):
     # partiendo de matrix_intermediate_damerau añadir recuperar
     # secuencia de operaciones de edición
     # completar versión Damerau-Levenstein intermedia con matriz
-    return 0,[] # COMPLETAR Y REEMPLAZAR ESTA PARTE
+    lenX, lenY = len(x), len(y)
+
+    D = np.zeros((lenX + 1, lenY + 1), dtype=int)
+    B = np.zeros((lenX + 1, lenY + 1), dtype=tuple)
+    for i in range(1, lenX + 1):
+        D[i][0] = D[i - 1][0] + 1
+        B[i][0] = (i-1,0)
+    for j in range(1, lenY + 1):
+        D[0][j] = D[0][j - 1] + 1
+        B[0][j] = (0,j - 1)
+        for i in range(1, lenX + 1):
+            D[i][j], B[i][j]= min(
+                (D[i - 1][j] + 1, (i - 1, j)),
+                (D[i][j - 1] + 1, (i, j - 1)),
+                (D[i - 1][j - 1] + (x[i - 1] != y[j - 1]), (i - 1, j - 1)),
+                ((D[i - 2][j - 2] + 1) if x[i - 1] == y[j - 2] and x[i - 2] == y[j - 1] else math.inf, (i - 2, j - 2)),
+                ((D[i - 3][j - 2] + 2) if x[i - 1] == y[j - 2] and x[i - 3] == y[j - 1] and x[i - 2] != y[
+                    j - 1] else math.inf, (i - 3, j - 2)),
+                ((D[i - 2][j - 3] + 2) if x[i - 1] == y[j - 3] and x[i - 2] == y[j - 1] and x[i - 1] != y[
+                    j - 2] else math.inf,(i - 2, j - 3)),
+            )
+    res = []
+    act = (lenX, lenY)
+    while D[act[0], act[1]] != 0:
+        prev = B[act[0]][act[1]]
+        if prev[0] == act[0]:
+            res.insert(0, ('', y[act[1] - 1]))
+        elif prev[1] == act[1]:
+            res.insert(0, (x[act[0] - 1], ''))
+        else:
+            if prev[0] + 1 == act[0] and prev[1] + 1 == act[1]:
+                res.insert(0, (x[act[0] - 1], y[act[1] - 1]))
+            else:
+                res.insert(0, (x[prev[0]: act[0]], y[prev[1]:act[1]]))
+        act = prev
+    return D[lenX, lenY],res
     
 def damerau_intermediate(x, y, threshold=None):
     # versión con reducción coste espacial y parada por threshold
