@@ -133,7 +133,7 @@ def levenshtein_cota_optimista(x, y, threshold): #JAVIER
     return threshold + 1 if cota_optimista > threshold else levenshtein(x, y, threshold)
 
 def damerau_restricted_matriz(x, y, threshold=None): #ALEX
-    # completar versión Damerau-Levenstein restringida con matriz
+    # completar versión Damerau-Levenstein restringida wcon matriz
     lenX, lenY = len(x), len(y)
 
     D = np.zeros((lenX + 1, lenY + 1), dtype=int)
@@ -187,9 +187,51 @@ def damerau_restricted_edicion(x, y, threshold=None): #ALEX
         act = prev
     return D[lenX, lenY], res # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
-def damerau_restricted(x, y, threshold=None): #HÉCTOR
+def damerau_restricted(x, y, threshold=None): #HECTOR
     # versión con reducción coste espacial y parada por threshold
-     return min(0,threshold+1) # COMPLETAR Y REEMPLAZAR ESTA PARTE
+    lenX, lenY = len(x), len(y)
+
+    vcurrent = np.zeros(lenX+1, dtype=int)
+    vprev = np.zeros(lenX+1, dtype=int)
+    vdprev = np.zeros(lenX+1, dtype=int)
+
+    
+    # B = np.zeros((lenX + 1, lenY + 1), dtype=tuple)
+    for i in range(1, lenX + 1):
+        vprev[i] = vprev[i-1] +1
+        # B[i][0] = (i-1, 0)
+    for j in range(1, lenY + 1):
+        vcurrent[0] = vprev[0] + 1
+        # B[0][j] = (0, j-1)
+        for i in range(1, lenX + 1):
+            vcurrent[i] = min(
+                vcurrent[i - 1] + 1,
+                vprev[i] + 1,
+                vprev[i - 1] + (x[i - 1] != y[j - 1]),
+                ((vdprev[i - 2]+1) if x[i-1]==y[j-2] and x[i-2]==y[j-1] else math.inf)
+            )
+        if min(vcurrent) > threshold:
+            return threshold+1
+        vcurrent, vprev, vdprev = vprev, vcurrent, vprev
+
+    if vprev[lenX] > threshold:
+        return threshold+1
+    return vprev[lenX]
+    res = []
+    act = (lenX, lenY)
+    while D[act[0], act[1]] != 0:
+        prev = B[act[0]][act[1]]
+        if prev[0] == act[0]:
+            res.insert(0, ('', y[act[1] - 1]))
+        elif prev[1] == act[1]:
+            res.insert(0, (x[act[0] - 1], ''))
+        else:
+            if prev[0] + 1 == act[0] and prev[1] + 1 == act[1]:
+                res.insert(0, (x[act[0] - 1], y[act[1] - 1]))
+            else:
+                res.insert(0, (x[prev[0]: act[0]], y[prev[1]:act[1]]))
+        act = prev
+    return D[lenX, lenY], res # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
 def damerau_intermediate_matriz(x, y, threshold=None): #ALEX
     # completar versión Damerau-Levenstein intermedia con matriz
