@@ -187,7 +187,7 @@ def damerau_restricted_edicion(x, y, threshold=None): #ALEX
         act = prev
     return D[lenX, lenY], res # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
-def damerau_restricted(x, y, threshold=None):
+def damerau_restricted(x, y, threshold=None): #HÉCTOR
     # versión con reducción coste espacial y parada por threshold
      return min(0,threshold+1) # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
