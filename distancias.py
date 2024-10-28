@@ -295,9 +295,51 @@ def damerau_intermediate_edicion(x, y, threshold=None): #ALEX
         act = prev
     return D[lenX, lenY],res
     
-def damerau_intermediate(x, y, threshold=None):
-    # versión con reducción coste espacial y parada por threshold
-    return min(0,threshold+1) # COMPLETAR Y REEMPLAZAR ESTA PARTE
+def damerau_intermediate(x, y, threshold=None): #JAVI
+    lenX, lenY = len(x), len(y)
+    
+    # Inicialización de los cuatro vectores columna
+    vprev3 = np.zeros(lenY + 1, dtype=int)  # Almacena tres filas anteriores
+    vprev2 = np.zeros(lenY + 1, dtype=int)  # Almacena dos filas anteriores
+    vprev = np.zeros(lenY + 1, dtype=int)   # Almacena la fila anterior
+    vcurrent = np.zeros(lenY + 1, dtype=int)  # Almacena la fila actual
+    
+    # Inicializar la primera fila de vcurrent para operaciones de inserción
+    for j in range(1, lenY + 1):
+        vcurrent[j] = j
+
+    # Recorro cada carácter de x
+    for i in range(1, lenX + 1):
+        # Inicializar la nueva fila de vcurrent
+        vnext = np.zeros(lenY + 1, dtype=int)
+        vnext[0] = i
+        
+        for j in range(1, lenY + 1):
+            cost = 0 if x[i - 1] == y[j - 1] else 1
+            vnext[j] = min(
+                vcurrent[j] + 1,         # Eliminación
+                vnext[j - 1] + 1,        # Inserción
+                vcurrent[j - 1] + cost   # Sustitución
+            )
+            
+            # Transposición básica `ab ↔ ba` (costo 1)
+            if i > 1 and j > 1 and x[i - 1] == y[j - 2] and x[i - 2] == y[j - 1]:
+                vnext[j] = min(vnext[j], vprev[j - 2] + 1)
+                
+            # Transposición intermedia `acb ↔ ba` (costo 2)
+            if i > 2 and j > 1 and x[i - 3] == y[j - 1] and x[i - 1] == y[j - 2]:
+                vnext[j] = min(vnext[j], vprev2[j - 2] + 2)
+                
+            # Transposición intermedia `ab ↔ bca` (costo 2)
+            if i > 1 and j > 2 and x[i - 1] == y[j - 3] and x[i - 2] == y[j - 1] and x[i - 3] == y[j - 2]:
+                vnext[j] = min(vnext[j], vprev3[j - 3] + 2)
+        
+        if threshold is not None and all(val > threshold for val in vnext):
+            return threshold + 1
+        
+        vprev3, vprev2, vprev, vcurrent = vprev2, vprev, vcurrent, vnext
+
+    return vcurrent[lenY]
 
 opcionesSpell = {
     'levenshtein_m': levenshtein_matriz,
