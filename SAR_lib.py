@@ -694,8 +694,14 @@ class SAR_Indexer:
                 else:
                     return [art_id for (art_id,_) in self.index[field][term]]
             else:
-                # Si no hay ninguna opción activada
-                return self.index[field].get(term,[])
+                # Si no hay ninguna opción
+                res = self.index[field].get(term,[])
+                if res == [] and self.use_spelling:
+                    spell = self.speller.suggest(term)
+                    for i in spell:
+                        res = self.or_posting(res,self.index[field][i])
+                    return res
+                return res
 
     '''MIQUEL'''
     def get_positionals(self, terms:str, field):
@@ -1125,6 +1131,6 @@ class SAR_Indexer:
         "distance" cadena, nombre de la función de distancia.
         "threshold" entero, umbral del corrector
         """
-        if self.use_spelling:
-            self.speller = spellsuggester.SpellSuggester(distancias.opcionesSpell,self.index.keys()
+        self.use_spelling = True
+        self.speller = spellsuggester.SpellSuggester(distancias.opcionesSpell,list(self.index['all'].keys())
                                                      ,distance,threshold)

@@ -75,11 +75,11 @@ class SpellSuggester:
             threshold = self.default_threshold
 
         # En principio deberia furular
-        resul = [[]*(threshold+1)]
+        resul = [[]for i in range(threshold)]
         for i in self.vocabulary:
             aux = self.distance_functions[distance](term, i, threshold)
             if aux <= threshold:
-                resul[aux].append(i)
+                resul[aux-1].append(i)
 
         if flatten:
             resul = [word for wlist in resul for word in wlist]
