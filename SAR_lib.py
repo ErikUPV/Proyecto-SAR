@@ -8,6 +8,10 @@ from pathlib import Path
 from typing import Optional, List, Union, Dict
 import pickle
 
+import distancias
+import spellsuggester
+
+
 class SAR_Indexer:
     """
     Prototipo de la clase para realizar la indexacion y la recuperacion de artículos de Wikipedia
@@ -61,6 +65,10 @@ class SAR_Indexer:
         self.show_snippet = False # valor por defecto, se cambia con self.set_snippet()
         self.use_stemming = False # valor por defecto, se cambia con self.set_stemming()
         self.use_ranking = False  # valor por defecto, se cambia con self.set_ranking()
+
+        # Addicion de ALT
+        self.use_spelling = False
+        self.speller:spellsuggester.SpellSuggester = None
 
         # ======== Inicializar los diccionarios del índice ========
         for (field,_) in self.fields:
@@ -676,6 +684,12 @@ class SAR_Indexer:
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (art_id,[ocrurrencias]), (art_id,[ocrurrencias]),...] 
                 if term not in self.index[field]:
+                    if self.use_spelling:
+                        spell = self.speller.suggest(term)
+                        res = []
+                        for i in spell:
+                            res = self.or_posting(res,[art_id for (art_id,_) in self.index[field][i]])
+                        return res # Espero q funcione
                     return []
                 else:
                     return [art_id for (art_id,_) in self.index[field][term]]
@@ -1100,3 +1114,17 @@ class SAR_Indexer:
         ################
         ## COMPLETAR  ##
         ################
+
+    def set_spelling(self, use_spelling: bool, distance: str = None,
+                     threshold: int = None): # ALEX
+        """
+        self.use_spelling a True activa la corrección ortográfica
+        EN LAS PALABRAS NO ENCONTRADAS, en caso contrario NO utilizará
+        corrección ortográfica
+        input: "use_spell" booleano, determina el uso del corrector.
+        "distance" cadena, nombre de la función de distancia.
+        "threshold" entero, umbral del corrector
+        """
+        if self.use_spelling:
+            self.speller = spellsuggester.SpellSuggester(distancias.opcionesSpell,self.index.keys()
+                                                     ,distance,threshold)

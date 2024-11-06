@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import re
 
+import distancias
+
+
 class SpellSuggester:
 
     """
@@ -71,11 +74,13 @@ class SpellSuggester:
         if threshold is None:
             threshold = self.default_threshold
 
-        ########################################
-        # COMPLETAR
-        ########################################
-        
-        resul = []
+        # En principio deberia furular
+        resul = [[]*(threshold+1)]
+        for i in self.vocabulary:
+            aux = self.distance_functions[distance](term, i, threshold)
+            if aux <= threshold:
+                resul[aux].append(i)
+
         if flatten:
             resul = [word for wlist in resul for word in wlist]
             
