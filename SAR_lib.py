@@ -679,7 +679,7 @@ class SAR_Indexer:
             return self.get_stemming(term,field)
         else:
             # Comprobar como se ha contruido el índice, si con poscionales o normal.
-            _, aux = self.index[field].popitem()
+            _, aux = list(self.index[field].items())[0]
             if isinstance(aux[0], tuple):
                 # Si no hay ninguna opción activada para el término pero se ha contruido con posicionales
                 # Cada token tiene una lista con forma [ (art_id,[ocrurrencias]), (art_id,[ocrurrencias]),...] 
@@ -1132,5 +1132,6 @@ class SAR_Indexer:
         "threshold" entero, umbral del corrector
         """
         self.use_spelling = True
-        self.speller = spellsuggester.SpellSuggester(distancias.opcionesSpell,list(self.index['all'].keys())
+        l = self.index['all'].keys()
+        self.speller = spellsuggester.SpellSuggester(distancias.opcionesSpell,list(l)
                                                      ,distance,threshold)
