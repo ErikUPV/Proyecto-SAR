@@ -169,11 +169,11 @@ def damerau_restricted_edicion(x, y, threshold=None): #ALEX
                 (D[i - 1][j] + 1, (i - 1, j)),
                 (D[i][j - 1] + 1, (i, j - 1)),
                 (D[i - 1][j - 1] + (x[i - 1] != y[j - 1]), (i - 1, j - 1)),
-                ((D[i - 2][j - 2] + 1) if x[i - 1] == y[j - 2] and x[i - 2] == y[j - 1] else math.inf, (i - 2, j - 2)) ,
+                ((D[i - 2][j - 2] + 1) if x[i - 2] == y[j - 1] and x[i - 1] == y[j - 2] else math.inf, (i - 2, j - 2)) ,
             )
     res = []
     act = (lenX, lenY)
-    while D[act[0], act[1]] != 0:
+    while B[act[0], act[1]] != 0:
         prev = B[act[0]][act[1]]
         if prev[0] == act[0]:
             res.insert(0, ('', y[act[1] - 1]))
@@ -185,6 +185,9 @@ def damerau_restricted_edicion(x, y, threshold=None): #ALEX
             else:
                 res.insert(0, (x[prev[0]: act[0]], y[prev[1]:act[1]]))
         act = prev
+
+
+
     return D[lenX, lenY], res # COMPLETAR Y REEMPLAZAR ESTA PARTE
 
 def damerau_restricted(x, y, threshold=None): #HECTOR
