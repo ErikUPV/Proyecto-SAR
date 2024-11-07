@@ -147,7 +147,7 @@ def damerau_restricted_matriz(x, y, threshold=None): #ALEX
                 D[i - 1][j] + 1,
                 D[i][j - 1] + 1,
                 D[i - 1][j - 1] + (x[i - 1] != y[j - 1]),
-                (D[i - 2][j - 2] + 1) if x[i - 1] == y[j - 2] and x[i - 2] == y[j - 1] else math.inf,
+                (D[i - 2][j - 2] + 1) if x[i - 2] == y[j - 1] and x[i - 1] == y[j - 2] else math.inf,
             )
     return D[lenX, lenY]
 
@@ -208,11 +208,11 @@ def damerau_restricted(x, y, threshold=None): #HECTOR
                 vcurrent[i - 1] + 1,
                 vprev[i] + 1,
                 vprev[i - 1] + (x[i - 1] != y[j - 1]),
-                ((vdprev[i - 2]+1) if x[i-1]==y[j-2] and x[i-2]==y[j-1] else math.inf)
+                ((vdprev[i - 2] + 1) if x[i - 2] == y[j - 1] and x[i - 1] == y[j - 2] else math.inf)
             )
         if min(vcurrent) > threshold:
             return threshold+1
-        vcurrent, vprev, vdprev = vprev, vcurrent, vprev
+        vcurrent, vprev, vdprev = vdprev, vcurrent, vprev
 
     if vprev[lenX] > threshold:
         return threshold+1
