@@ -252,8 +252,8 @@ def damerau_intermediate_matriz(x, y, threshold=None): #ALEX
                 D[i][j - 1] + 1,
                 D[i - 1][j - 1] + (x[i - 1] != y[j - 1]),
                 (D[i - 2][j - 2] + 1) if x[i - 1] == y[j - 2] and x[i - 2] == y[j - 1] else math.inf,
-                (D[i - 3][j - 2] + 2) if x[i - 1] == y[j - 2] and x[i - 3] == y[j - 1] and x[i - 2] != y[j - 1] else math.inf,
-                (D[i - 2][j - 3] + 2) if x[i - 1] == y[j - 3] and x[i - 2] == y[j - 1] and x[i - 1] != y[j - 2] else math.inf,
+                (D[i - 3][j - 2] + 2) if i >= 3 and j >= 2 and x[i - 1] == y[j - 2] and x[i - 3] == y[j - 1] and x[i - 2] != y[j - 1] else math.inf,
+                (D[i - 2][j - 3] + 2) if i >= 2 and j >= 3 and x[i - 1] == y[j - 3] and x[i - 2] == y[j - 1] and x[i - 1] != y[j - 2]  else math.inf,
             )
     return D[lenX, lenY]
 
