@@ -23,7 +23,7 @@ def testear_suggester():
                 for threshold in range(1, 4+1):
                     newresul = spellsuggester.suggest(palabra, distance=dstname,
                                                    threshold=threshold, flatten=False)
-                    assert(all(x == y for x,y in zip(resul,newresul)))
+                    assert(all(x == y for x, y in zip(resul, newresul)))
                     resul = newresul
                 longitudes = [len(x) for x in resul]
                 print(" -",palabra,longitudes,sum(longitudes))
