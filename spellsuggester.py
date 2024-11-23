@@ -77,8 +77,6 @@ class SpellSuggester:
         # En principio deberia furular
         resul = [[]for i in range(threshold+1)]
         for i in self.vocabulary:
-            if i == 'rx':
-                pass
             aux = self.distance_functions[distance](term, i, threshold)
             if aux <= threshold:
                 resul[aux].append(i)
