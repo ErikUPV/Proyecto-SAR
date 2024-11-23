@@ -298,6 +298,32 @@ def damerau_intermediate_edicion(x, y, threshold=None): #ALEX
     return D[lenX, lenY],res
     
 def damerau_intermediate(x, y, threshold=None): #JAVI
+
+    lenX, lenY = len(x), len(y)
+
+    D = np.zeros((lenX + 1,4), dtype=int)
+    for i in range(1, lenX + 1):
+        D[i][2] = D[i - 1][2] + 1
+    for j in range(1, lenY + 1):
+        D[0][3] = D[0][2] + 1
+        for i in range(1, lenX + 1):
+            D[i][3] = min(
+                D[i - 1][3] + 1,
+                D[i][2] + 1,
+                D[i - 1][2] + (x[i - 1] != y[j - 1]),
+                (D[i - 2][1] + 1) if i > 1 and j > 1 and x[i - 1] == y[j - 2] and x[i - 2] == y[
+                    j - 1] else math.inf,
+                (D[i - 3][1] + 2) if i >= 3 and j >= 2 and x[i - 1] == y[j - 2] and x[i - 3] == y[j - 1] and x[
+                    i - 2] != y[j - 1] else math.inf,
+                (D[i - 2][0] + 2) if i >= 2 and j >= 3 and x[i - 1] == y[j - 3] and x[i - 2] == y[j - 1] and x[
+                    i - 1] != y[j - 2] else math.inf,
+            )
+        D[:,0] = D[:,1]
+        D[:,1] = D[:,2]
+        D[:,2] = D[:,3]
+
+    return D[lenX, 3]
+    """
     lenX, lenY = len(x), len(y)
     
     # Inicialización de los cuatro vectores columna
@@ -341,7 +367,7 @@ def damerau_intermediate(x, y, threshold=None): #JAVI
         
         vprev3, vprev2, vprev, vcurrent = vprev2, vprev, vcurrent, vnext
 
-    return vcurrent[lenY]
+    return vcurrent[lenY]"""
 
 opcionesSpell = {
     'levenshtein_m': levenshtein_matriz,
