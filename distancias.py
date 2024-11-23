@@ -321,7 +321,9 @@ def damerau_intermediate(x, y, threshold=None): #JAVI
         D[:,0] = D[:,1]
         D[:,1] = D[:,2]
         D[:,2] = D[:,3]
-
+    if min(D[:,3]) > threshold:
+        return threshold+1
+    
     return D[lenX, 3]
     """
     lenX, lenY = len(x), len(y)
