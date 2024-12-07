@@ -69,7 +69,6 @@ class SAR_Indexer:
         # Addicion de ALT
         self.use_spelling = False
         self.speller:spellsuggester.SpellSuggester = None
-        self.speller = False
 
         # ======== Inicializar los diccionarios del índice ========
         for (field,_) in self.fields:
